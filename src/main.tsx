@@ -1,0 +1,22 @@
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import { ThemeProvider } from "./components/ThemeProvider"
+import { BoardProvider } from "./context/BoardContext"
+import { TeamProvider } from "./contexts/TeamContext"
+import './index.css'
+import App from './App.tsx'
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <BoardProvider>
+        <TeamProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </TeamProvider>
+      </BoardProvider>
+    </ThemeProvider>
+  </StrictMode>,
+)
