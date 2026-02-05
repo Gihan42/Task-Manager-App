@@ -45,7 +45,9 @@
 }
 
 /* Global Reset to prevent body scroll */
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   width: 100%;
   margin: 0;
@@ -85,7 +87,8 @@ html, body, #root {
 
 /* Antigravity-style Animations */
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
@@ -94,7 +97,8 @@ html, body, #root {
 }
 
 @keyframes floatSlow {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px) translateX(0px) rotate(0deg);
   }
   33% {
@@ -106,7 +110,8 @@ html, body, #root {
 }
 
 @keyframes gradientShift {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -115,7 +120,8 @@ html, body, #root {
 }
 
 @keyframes glowPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.3;
     filter: blur(20px);
   }
@@ -152,8 +158,9 @@ html, body, #root {
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, 
-    hsl(var(--primary)) 0%, 
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)) 0%,
     hsl(217 91% 70%) 25%,
     hsl(280 70% 60%) 50%,
     hsl(340 80% 60%) 75%,
@@ -168,14 +175,22 @@ html, body, #root {
 
 /* Gradient Text Utilities */
 .gradient-text {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(280 70% 60%) 100%);
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)) 0%,
+    hsl(280 70% 60%) 100%
+  );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .gradient-text-blue {
-  background: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(200 80% 50%) 100%);
+  background: linear-gradient(
+    135deg,
+    hsl(217 91% 60%) 0%,
+    hsl(200 80% 50%) 100%
+  );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -189,7 +204,11 @@ html, body, #root {
 }
 
 .gradient-text-green {
-  background: linear-gradient(135deg, hsl(145 70% 50%) 0%, hsl(160 60% 45%) 100%);
+  background: linear-gradient(
+    135deg,
+    hsl(145 70% 50%) 0%,
+    hsl(160 60% 45%) 100%
+  );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -221,7 +240,11 @@ html, body, #root {
   right: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, hsl(var(--primary) / 0.3) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    hsl(var(--primary) / 0.3) 0%,
+    transparent 70%
+  );
   opacity: 0;
   transition: opacity 0.5s ease;
   pointer-events: none;
@@ -238,7 +261,11 @@ html, body, #root {
   right: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, hsl(217 91% 60% / 0.3) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    hsl(217 91% 60% / 0.3) 0%,
+    transparent 70%
+  );
   opacity: 0;
   transition: opacity 0.5s ease;
   pointer-events: none;
@@ -255,7 +282,11 @@ html, body, #root {
   right: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, hsl(30 90% 55% / 0.3) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    hsl(30 90% 55% / 0.3) 0%,
+    transparent 70%
+  );
   opacity: 0;
   transition: opacity 0.5s ease;
   pointer-events: none;
@@ -272,7 +303,11 @@ html, body, #root {
   right: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, hsl(145 70% 50% / 0.3) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    hsl(145 70% 50% / 0.3) 0%,
+    transparent 70%
+  );
   opacity: 0;
   transition: opacity 0.5s ease;
   pointer-events: none;
@@ -295,7 +330,11 @@ html, body, #root {
 .shape-1 {
   width: 300px;
   height: 300px;
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(280 70% 60%) 100%);
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)) 0%,
+    hsl(280 70% 60%) 100%
+  );
   top: 10%;
   left: 10%;
   animation-delay: 0s;
@@ -304,7 +343,11 @@ html, body, #root {
 .shape-2 {
   width: 400px;
   height: 400px;
-  background: linear-gradient(135deg, hsl(340 80% 60%) 0%, hsl(217 91% 60%) 100%);
+  background: linear-gradient(
+    135deg,
+    hsl(340 80% 60%) 0%,
+    hsl(217 91% 60%) 100%
+  );
   top: 50%;
   right: 10%;
   animation-delay: -5s;
@@ -313,7 +356,11 @@ html, body, #root {
 .shape-3 {
   width: 250px;
   height: 250px;
-  background: linear-gradient(135deg, hsl(145 70% 50%) 0%, hsl(200 80% 50%) 100%);
+  background: linear-gradient(
+    135deg,
+    hsl(145 70% 50%) 0%,
+    hsl(200 80% 50%) 100%
+  );
   bottom: 20%;
   left: 20%;
   animation-delay: -10s;
@@ -322,7 +369,11 @@ html, body, #root {
 .shape-4 {
   width: 350px;
   height: 350px;
-  background: linear-gradient(135deg, hsl(30 90% 55%) 0%, hsl(var(--primary)) 100%);
+  background: linear-gradient(
+    135deg,
+    hsl(30 90% 55%) 0%,
+    hsl(var(--primary)) 100%
+  );
   top: 30%;
   left: 50%;
   animation-delay: -15s;
@@ -331,7 +382,11 @@ html, body, #root {
 .shape-5 {
   width: 200px;
   height: 200px;
-  background: linear-gradient(135deg, hsl(280 70% 60%) 0%, hsl(340 80% 60%) 100%);
+  background: linear-gradient(
+    135deg,
+    hsl(280 70% 60%) 0%,
+    hsl(340 80% 60%) 100%
+  );
   bottom: 10%;
   right: 30%;
   animation-delay: -7s;
@@ -340,12 +395,15 @@ html, body, #root {
 .shape-6 {
   width: 450px;
   height: 450px;
-  background: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(145 70% 50%) 100%);
+  background: linear-gradient(
+    135deg,
+    hsl(217 91% 60%) 0%,
+    hsl(145 70% 50%) 100%
+  );
   top: 70%;
   right: 50%;
   animation-delay: -12s;
 }
-
 
 /* Apply transitions to theme changes */
 body,
@@ -446,7 +504,6 @@ button {
   }
 }
 
-
 /* Spacing (Gap) */
 .gap-1 {
   gap: 0.25rem;
@@ -466,7 +523,6 @@ button {
 .gap-8 {
   gap: 2rem;
 }
-
 
 /* Spacing (Margin/Padding) */
 .p-2 {
@@ -609,7 +665,6 @@ button {
 .min-w-max {
   min-width: max-content;
 }
-
 
 /* Typography */
 .text-xs {
@@ -1107,4 +1162,36 @@ select option {
 
 .MuiInputBase-root.Mui-focused {
   box-shadow: none !important;
+}
+
+/* Manual Dark Mode Utilities for Action Buttons */
+.dark .dark\:bg-muted {
+  background-color: hsl(var(--muted));
+}
+.dark .dark\:text-foreground {
+  color: hsl(var(--foreground));
+}
+
+/* Theme-aware Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 5px;
+  border: 2px solid hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+::-webkit-scrollbar-corner {
+  background: hsl(var(--background));
 }

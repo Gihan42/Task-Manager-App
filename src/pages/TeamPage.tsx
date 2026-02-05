@@ -216,21 +216,21 @@ export const Team = () => {
                                 <div className="flex items-center justify-end gap-2">
                                     <button 
                                         onClick={() => setShowAssignModal(member.id)}
-                                        className="p-2 rounded hover:bg-muted text-muted-foreground hover:text-primary transition-colors"
+                                        className="p-2 rounded hover:bg-muted dark:bg-muted dark:text-foreground text-muted-foreground hover:text-primary transition-colors"
                                         title="Assign Project"
                                     >
                                         <Briefcase size={16} />
                                     </button>
                                     <button 
                                         onClick={() => openEditModal(member)}
-                                        className="p-2 rounded hover:bg-muted text-muted-foreground hover:text-primary transition-colors"
+                                        className="p-2 rounded hover:bg-muted dark:bg-muted dark:text-foreground text-muted-foreground hover:text-primary transition-colors"
                                         title="Edit Roles"
                                     >
                                         <Shield size={16} />
                                     </button>
                                     <button 
                                         onClick={() => removeMember(member.id)}
-                                        className="p-2 rounded hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-colors"
+                                        className="p-2 rounded hover:bg-red-500/10 dark:bg-muted dark:text-foreground text-muted-foreground hover:text-red-500 transition-colors"
                                         title="Delete"
                                     >
                                         <Trash2 size={16} />
