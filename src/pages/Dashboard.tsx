@@ -82,7 +82,7 @@ export const Dashboard = () => {
                     className="flex items-center justify-center gap-4"
                 >
                     <Link to="/boards">
-                        <Button size="lg" className="px-8 py-6 text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all bg-gradient-to-r from-primary to-primary/80 group">
+                        <Button size="lg" className="px-8 py-6 text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all bg-primary hover:bg-primary/90 group">
                             View Your Boards
                             <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
                         </Button>

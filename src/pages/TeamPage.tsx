@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserPlus, Trash2, Mail, Calendar, X, Search, Check, Shield, Briefcase, LayoutGrid, Table as TableIcon } from 'lucide-react';
 import { TextField, InputAdornment, Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Checkbox, ListItemText, FormControl, InputLabel } from '@mui/material';
-import { useTeam, type TeamMember, type Role } from '../contexts/TeamContext';
+import { useTeam, type TeamMember, type Role } from '../context/TeamContext';
 import { useBoard } from '../context/BoardContext';
 import { Button } from '../components/ui/Button';
 
@@ -101,7 +101,7 @@ export const Team = () => {
           <div className="flex gap-3">
             <Button
                 onClick={() => setShowAddModal(true)}
-                className="inline-flex items-center gap-2"
+                className="inline-flex items-center gap-2 shadow-lg hover:scale-105 transition-transform bg-primary hover:bg-primary/90"
             >
                 <UserPlus size={18} />
                 Add Member

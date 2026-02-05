@@ -43,7 +43,7 @@ export const Boards = () => {
                             Jump right back into your work
                         </p>
                     </div>
-                    <Button onClick={() => setIsCreating(true)} className="shadow-lg hover:scale-105 transition-transform">
+                    <Button onClick={() => setIsCreating(true)} className="shadow-lg hover:scale-105 transition-transform bg-primary hover:bg-primary/90">
                         <Plus className="mr-2 h-4 w-4" /> Create Board
                     </Button>
                 </div>

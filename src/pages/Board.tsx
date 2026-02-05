@@ -6,7 +6,7 @@ import { Edit as EditIcon, Check as CheckIcon, Close as CloseIcon } from '@mui/i
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import { Button } from '../components/ui/Button';
 import { useBoard } from '../context/BoardContext';
-import { useTeam } from '../contexts/TeamContext';
+import { useTeam } from '../context/TeamContext';
 
 export const Board = () => {
     const { boardId } = useParams();

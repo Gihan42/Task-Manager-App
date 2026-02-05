@@ -7,6 +7,8 @@ import { Boards } from './pages/Boards';
 import { Board } from './pages/Board';
 import { Team } from './pages/TeamPage';
 
+import { NotFound } from './pages/NotFound';
+
 function App() {
   return (
     <Routes>
@@ -19,6 +21,9 @@ function App() {
         <Route path="board/:boardId" element={<Board />} />
         <Route path="team" element={<Team />} />
       </Route>
+
+      {/* Catch-all 404 */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

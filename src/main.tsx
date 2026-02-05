@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from "./components/ThemeProvider"
 import { BoardProvider } from "./context/BoardContext"
-import { TeamProvider } from "./contexts/TeamContext"
+import { TeamProvider } from "./context/TeamContext.tsx"
 import './index.css'
 import App from './App.tsx'
 

@@ -15,20 +15,35 @@ export const AppLayout = () => {
   ];
 
   return (
-    <div className="layout-container">
+    <div className="layout-container relative min-h-screen flex">
+      {/* Global Background Gradients */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] bg-violet-600/20 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute top-[40%] -right-[10%] w-[60vw] h-[60vw] bg-indigo-600/20 rounded-full blur-[100px]" />
+        <div className="absolute -bottom-[20%] left-[20%] w-[50vw] h-[50vw] bg-blue-600/20 rounded-full blur-[100px]" />
+         {/* Floating Shapes */}
+         <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="floating-shape shape-1 opacity-20" />
+            <div className="floating-shape shape-2 opacity-20" />
+            <div className="floating-shape shape-3 opacity-20" />
+         </div>
+      </div>
+
       {/* Sidebar */}
       <aside style={{ 
         width: isCollapsed ? '70px' : 'var(--sidebar-width)', 
-        borderRight: '1px solid hsl(var(--border))', 
-        backgroundColor: 'hsl(var(--card))',
+        borderRight: '1px solid hsl(var(--border) / 0.3)', 
+        background: 'linear-gradient(180deg, hsl(var(--card) / 0.4) 0%, hsl(var(--card) / 0.2) 100%)',
+        backdropFilter: 'blur(12px)',
         display: 'flex',
         flexDirection: 'column',
         transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        overflow: 'hidden',
-        position: 'relative',
+        position: 'sticky',
+        top: 0,
+        height: '100vh',
         zIndex: 20
       }}>
-        <div className="p-4 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(var(--border))', height: '64px' }}>
+        <div className="p-4 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(var(--border) / 0.3)', height: '64px', flexShrink: 0 }}>
           {!isCollapsed && (
              <h1 className="font-bold text-xl truncate animate-fade-in" style={{ color: 'hsl(var(--primary))' }}>
                 TaskFlow
@@ -38,23 +53,23 @@ export const AppLayout = () => {
              onClick={() => setIsCollapsed(!isCollapsed)}
              className={`p-2 rounded-lg transition-all ${isCollapsed ? 'mx-auto' : ''}`}
              style={{
-               background: 'hsl(var(--muted) / 0.5)',
-               backdropFilter: 'blur(10px)',
-               border: '1px solid hsl(var(--border) / 0.5)',
+               background: 'hsl(var(--muted) / 0.4)',
+               backdropFilter: 'blur(4px)',
+               border: '1px solid hsl(var(--border) / 0.4)',
                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
                cursor: 'pointer',
                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
              }}
              onMouseEnter={(e) => {
                e.currentTarget.style.transform = 'scale(1.1)';
-               e.currentTarget.style.background = 'hsl(var(--primary) / 0.1)';
-               e.currentTarget.style.borderColor = 'hsl(var(--primary) / 0.3)';
+               e.currentTarget.style.background = 'hsl(var(--primary) / 0.2)';
+               e.currentTarget.style.borderColor = 'hsl(var(--primary) / 0.4)';
                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
              }}
              onMouseLeave={(e) => {
                e.currentTarget.style.transform = 'scale(1)';
-               e.currentTarget.style.background = 'hsl(var(--muted) / 0.5)';
-               e.currentTarget.style.borderColor = 'hsl(var(--border) / 0.5)';
+               e.currentTarget.style.background = 'hsl(var(--muted) / 0.4)';
+               e.currentTarget.style.borderColor = 'hsl(var(--border) / 0.4)';
                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.05)';
              }}
              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -80,7 +95,7 @@ export const AppLayout = () => {
                       borderRadius: 'var(--radius)',
                       textDecoration: 'none',
                       color: isActive ? 'hsl(var(--primary))' : 'hsl(var(--foreground))',
-                      backgroundColor: isActive ? 'hsl(var(--secondary))' : 'transparent',
+                      backgroundColor: isActive ? 'hsl(var(--secondary) / 0.8)' : 'transparent',
                       fontWeight: isActive ? 500 : 400,
                       justifyContent: isCollapsed ? 'center' : 'flex-start',
                       transition: 'all 0.2s ease',
@@ -97,7 +112,7 @@ export const AppLayout = () => {
           </ul>
         </nav>
 
-        <div className="p-3" style={{ borderTop: '1px solid hsl(var(--border))' }}>
+        <div className="p-3" style={{ borderTop: '1px solid hsl(var(--border) / 0.3)', flexShrink: 0 }}>
            <button style={{
              display: 'flex',
              alignItems: 'center',
@@ -121,7 +136,7 @@ export const AppLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="main-content bg-muted/20" style={{ flex: 1, minWidth: 0 }}>
+      <main className="main-content" style={{ flex: 1, minWidth: 0, background: 'transparent', position: 'relative', zIndex: 10 }}>
         <header className="flex justify-between items-center mb-8 animate-fade-in">
             <h2 className="text-xl font-bold">Welcome back!</h2>
             <div className="flex items-center gap-4">
