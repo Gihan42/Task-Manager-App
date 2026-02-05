@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { LayoutDashboard, CheckCircle2, ListTodo, Clock, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { useBoard } from '../context/BoardContext';
+import { useBoard } from '../hooks/useBoard';
 import { motion } from 'framer-motion';
 
 export const Dashboard = () => {

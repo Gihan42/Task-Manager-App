@@ -5,8 +5,8 @@ import { TextField, IconButton, Button as MuiButton } from '@mui/material';
 import { Edit as EditIcon, Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import { Button } from '../components/ui/Button';
-import { useBoard } from '../context/BoardContext';
-import { useTeam } from '../context/TeamContext';
+import { useBoard } from '../hooks/useBoard';
+import { useTeam } from '../hooks/useTeam';
 
 export const Board = () => {
     const { boardId } = useParams();

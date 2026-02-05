@@ -1,27 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Board, List, Task } from '../types';
-
-interface BoardContextType {
-    boards: Board[];
-    createBoard: (title: string, color: string) => void;
-    addList: (boardId: string, title: string) => void;
-    addTask: (boardId: string, listId: string, content: string) => void;
-    moveTask: (boardId: string, sourceListId: string, destListId: string, sourceIndex: number, destIndex: number) => void;
-    moveList: (boardId: string, sourceIndex: number, destIndex: number) => void;
-    reorderLists: (boardId: string, newLists: List[]) => void;
-    updateTaskOrder: (boardId: string, listId: string, newTasks: Task[]) => void;
-    updateTask: (boardId: string, listId: string, taskId: string, updates: Partial<Task>) => void;
-}
-
-const BoardContext = createContext<BoardContextType | undefined>(undefined);
-
-export const useBoard = () => {
-    const context = useContext(BoardContext);
-    if (!context) {
-        throw new Error('useBoard must be used within a BoardProvider');
-    }
-    return context;
-};
+import { BoardContext } from './board-context';
 
 // Initial data for demonstration only if storage is empty
 const INITIAL_DATA: Board[] = [
@@ -132,7 +111,7 @@ export const BoardProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                             if (card.id !== taskId) return card;
                             
                             // Handle assignment metadata
-                            let finalUpdates = { ...updates };
+                            const finalUpdates = { ...updates };
                             if ('assignee' in updates) {
                                 if (updates.assignee) {
                                     finalUpdates.assignedAt = new Date().toISOString();

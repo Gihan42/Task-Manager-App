@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { useBoard } from '../context/BoardContext';
+import { useBoard } from '../hooks/useBoard';
 import { motion } from 'framer-motion';
 
 export const Boards = () => {

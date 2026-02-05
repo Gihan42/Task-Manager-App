@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserPlus, Trash2, Mail, Calendar, X, Search, Check, Shield, Briefcase, LayoutGrid, Table as TableIcon } from 'lucide-react';
+import { UserPlus, Trash2, X, Search, Check, Shield, Briefcase } from 'lucide-react';
 import { TextField, InputAdornment, Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Checkbox, ListItemText, FormControl, InputLabel } from '@mui/material';
-import { useTeam, type TeamMember, type Role } from '../context/TeamContext';
-import { useBoard } from '../context/BoardContext';
+import { type TeamMember, type Role } from '../context/team-context';
+import { useTeam } from '../hooks/useTeam';
+import { useBoard } from '../hooks/useBoard';
 import { Button } from '../components/ui/Button';
 
 const AVAILABLE_ROLES: Role[] = ['Manager', 'TechLead', 'Developer', 'Designer', 'Tester'];
@@ -67,10 +68,6 @@ export const Team = () => {
     }
   };
 
-  const getRoleColor = (role: Role) => {
-    // Returning a neutral color as requested
-    return 'hsl(var(--muted))';
-  };
 
   const getInitials = (name: string) => {
     return name
