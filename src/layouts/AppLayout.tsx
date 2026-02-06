@@ -1,12 +1,25 @@
 
-import { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, KanbanSquare, Users, LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ModeToggle } from '../components/ModeToggle';
+import { useAuth } from '../context/AuthContext';
 
 export const AppLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout, loading } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/login');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+      return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
@@ -128,6 +141,7 @@ export const AppLayout = () => {
            }}
            className="hover:bg-muted/50 transition-colors"
            title={isCollapsed ? "Logout" : undefined}
+           onClick={logout}
            >
              <LogOut size={20} />
              {!isCollapsed && <span className="animate-fade-in truncate">Logout</span>}
@@ -138,10 +152,16 @@ export const AppLayout = () => {
       {/* Main Content */}
       <main className="main-content" style={{ flex: 1, minWidth: 0, background: 'transparent', position: 'relative', zIndex: 10 }}>
         <header className="flex justify-between items-center mb-8 animate-fade-in">
-            <h2 className="text-xl font-bold">Welcome back!</h2>
+            <h2 className="text-xl font-bold">Welcome back, {user?.displayName?.split(' ')[0] || 'User'}!</h2>
             <div className="flex items-center gap-4">
                 <ModeToggle />
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'hsl(var(--primary))' }}></div>
+                {user?.photoURL ? (
+                    <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full object-cover border border-border" />
+                ) : (
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium text-sm border border-primary/20">
+                        {user?.displayName?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                )}
             </div>
         </header>
         <div className="animate-slide-up">

@@ -1,67 +1,147 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { TeamContext, type TeamMember, type Role } from './team-context';
+import { collection, onSnapshot, query, addDoc, deleteDoc, where, getDocs, updateDoc, doc, writeBatch } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { useAuth } from './AuthContext';
+import { useToast } from './ToastContext';
+import defaultRoles from '../data/roles.json';
 
 export const TeamProvider = ({ children }: { children: ReactNode }) => {
-  const [members, setMembers] = useState<TeamMember[]>([
-    {
-      id: '1',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      roles: ['Developer', 'Manager'],
-      assignedBoardIds: ['1'],
-      joinedDate: '2024-01-15',
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      roles: ['Tester', 'Developer'],
-      assignedBoardIds: [],
-      joinedDate: '2024-02-20',
-    },
-    {
-      id: '3',
-      name: 'Bob Johnson',
-      email: 'bob.johnson@example.com',
-      roles: ['Designer'],
-      assignedBoardIds: ['1'],
-      joinedDate: '2024-03-10',
-    },
-  ]);
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const { user } = useAuth();
+  const toast = useToast();
 
-  const addMember = (memberData: Omit<TeamMember, 'id' | 'joinedDate' | 'assignedBoardIds'>) => {
-    const newMember: TeamMember = {
-      ...memberData,
-      id: Date.now().toString(),
-      assignedBoardIds: [],
-      joinedDate: new Date().toISOString().split('T')[0],
+  useEffect(() => {
+    if (!user) {
+        setMembers([]);
+        return;
+    }
+
+    let usersMap: Record<string, any> = {};
+    let assignmentsMap: Record<string, string[]> = {};
+
+    const mergeAndSetMembers = () => {
+        const mergedMembers: TeamMember[] = Object.values(usersMap).map((userData: any) => ({
+             id: userData.id,
+             name: userData.name || 'Unknown User',
+             email: userData.email || '',
+             roles: userData.roles || [defaultRoles.availableRoles[0]],
+             assignedBoardIds: assignmentsMap[userData.id] || [],
+             joinedDate: userData.createdAt ? userData.createdAt.split('T')[0] : new Date().toISOString().split('T')[0],
+        }));
+        setMembers(mergedMembers);
     };
-    setMembers([...members, newMember]);
+
+    const usersQuery = query(collection(db, "users"));
+    const unsubUsers = onSnapshot(usersQuery, (snapshot) => {
+        usersMap = {};
+        snapshot.docs.forEach(doc => {
+            usersMap[doc.id] = { id: doc.id, ...doc.data() };
+        });
+        mergeAndSetMembers();
+    });
+
+    const assignmentsQuery = query(collection(db, "user_projects"));
+    const unsubAssignments = onSnapshot(assignmentsQuery, (snapshot) => {
+        assignmentsMap = {};
+        snapshot.docs.forEach(doc => {
+            const data = doc.data();
+            if (!assignmentsMap[data.userId]) {
+                assignmentsMap[data.userId] = [];
+            }
+            if (!assignmentsMap[data.userId].includes(data.projectId)) {
+                 assignmentsMap[data.userId].push(data.projectId);
+            }
+        });
+        mergeAndSetMembers();
+    });
+
+    return () => {
+        unsubUsers();
+        unsubAssignments();
+    };
+  }, [user]);
+
+  const addMember = async (memberData: Omit<TeamMember, 'id' | 'joinedDate' | 'assignedBoardIds'>) => {
+    try {
+        const newMemberData = {
+            name: memberData.name,
+            email: memberData.email || "", // Handle optional email
+            roles: memberData.roles,
+            assignedBoardIds: [],
+            createdAt: new Date().toISOString(),
+            photoURL: ""
+        };
+
+        await addDoc(collection(db, "users"), newMemberData);
+        
+        // We don't need to manually update state as the onSnapshot listener will pick it up
+        toast.success(`Member "${memberData.name}" added successfully`);
+    } catch (error: any) {
+        toast.error(`Failed to add member: ${error.message}`);
+    }
   };
 
-  const removeMember = (id: string) => {
-    setMembers(members.filter(member => member.id !== id));
+  const removeMember = async (id: string) => {
+    try {
+        const batch = writeBatch(db);
+
+        const userRef = doc(db, "users", id);
+        batch.delete(userRef);
+
+        const assignmentsQuery = query(collection(db, "user_projects"), where("userId", "==", id));
+        const assignmentsSnapshot = await getDocs(assignmentsQuery);
+        assignmentsSnapshot.forEach((doc) => {
+            batch.delete(doc.ref);
+        });
+
+        await batch.commit();
+        toast.success("Member removed successfully");
+    } catch (error: any) {
+        toast.error(`Failed to remove member: ${error.message}`);
+    }
   };
 
-  const updateMemberRoles = (id: string, roles: Role[]) => {
-    setMembers(members.map(member =>
-      member.id === id ? { ...member, roles } : member
-    ));
+  const updateMemberRoles = async (id: string, roles: Role[]) => {
+    try {
+        await updateDoc(doc(db, "users", id), {
+            roles: roles
+        });
+        toast.success("Role updated successfully");
+    } catch (error: any) {
+        toast.error(`Failed to update role: ${error.message}`);
+    }
   };
 
-  const assignMemberToBoard = (memberId: string, boardId: string) => {
-    setMembers(members.map(member => {
-      if (member.id !== memberId) return member;
-      if (member.assignedBoardIds.includes(boardId)) return member;
-      return { ...member, assignedBoardIds: [...member.assignedBoardIds, boardId] };
-    }));
+  const assignMemberToBoard = async (memberId: string, boardId: string, role: Role) => {
+    try {
+        await addDoc(collection(db, "user_projects"), {
+            userId: memberId,
+            projectId: boardId,
+            role: role,
+            assignedAt: new Date().toISOString()
+        });
+        toast.success("Member assigned to board");
+    } catch (error: any) {
+        toast.error(`Failed to assign member: ${error.message}`);
+    }
   };
 
-  const removeMemberFromBoard = (memberId: string, boardId: string) => {
-    setMembers(members.map(member => {
-      if (member.id !== memberId) return member;
-      return { ...member, assignedBoardIds: member.assignedBoardIds.filter(id => id !== boardId) };
-    }));
+  const removeMemberFromBoard = async (memberId: string, boardId: string) => {
+    try {
+        const q = query(
+            collection(db, "user_projects"), 
+            where("userId", "==", memberId),
+            where("projectId", "==", boardId)
+        );
+        const snapshot = await getDocs(q);
+        snapshot.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+        });
+        toast.success("Member removed from board");
+    } catch (error: any) {
+        toast.error(`Failed to remove member from board: ${error.message}`);
+    }
   };
 
   return (

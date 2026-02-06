@@ -1,20 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Github } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 export const Signup = () => {
     const navigate = useNavigate();
+    const { signup, loginWithGoogle } = useAuth();
+    const toast = useToast();
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Placeholder auth logic
-        navigate('/');
+        setError('');
+        setLoading(true);
+        try {
+            await signup(email, password, name);
+            toast.success('Account created successfully!');
+            navigate('/');
+        } catch (err: any) {
+            const errorMessage = err.code === 'auth/email-already-in-use' 
+                ? 'This email is already registered' 
+                : err.code === 'auth/weak-password'
+                ? 'Password should be at least 6 characters'
+                : err.message || 'Failed to create account';
+            setError(errorMessage);
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleSocialLogin = (provider: string) => {
-        console.log(`Sign up with ${provider}`);
+    const handleSocialLogin = async (provider: string) => {
+        if (provider === 'google') {
+            try {
+                await loginWithGoogle();
+                toast.success('Account created successfully!');
+                navigate('/');
+            } catch (err: any) {
+                const errorMessage = 'Failed to sign up with Google';
+                setError(errorMessage);
+                toast.error(errorMessage);
+            }
+        }
     };
 
     return (
@@ -25,14 +59,23 @@ export const Signup = () => {
                     <p className="text-muted-foreground text-sm">Enter your email below to create your account</p>
                 </div>
 
+                {error && (
+                    <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4" />
+                        <p>{error}</p>
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-4">
-                     <div className="space-y-2">
+                    <div className="space-y-2">
                          <Input 
                             label="Name" 
                             type="text" 
                             placeholder="John Doe" 
                             required 
                             className="bg-muted/30"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                         />
                     </div>
                     <div className="space-y-2">
@@ -42,6 +85,8 @@ export const Signup = () => {
                             placeholder="m@example.com" 
                             required 
                             className="bg-muted/30"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
                     <div className="space-y-2">
@@ -51,11 +96,13 @@ export const Signup = () => {
                             placeholder="••••••••" 
                             required 
                             className="bg-muted/30"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
                     
-                    <Button type="submit" className="w-full font-semibold shadow-md">
-                        Create Account
+                    <Button type="submit" className="w-full font-semibold shadow-md" disabled={loading}>
+                        {loading ? 'Creating Account...' : 'Create Account'}
                     </Button>
                 </form>
 
@@ -68,17 +115,13 @@ export const Signup = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                     <Button variant="ghost" className="btn-social w-full flex gap-2 items-center justify-center" onClick={() => handleSocialLogin('google')}>
                         <svg className="h-5 w-5"  width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                             <path d="M17.788 5.108a9 9 0 1 0 3.212 6.892h-8" />
                         </svg>
                         Google
-                    </Button>
-                    <Button variant="ghost" className="btn-social w-full flex gap-2 items-center justify-center" onClick={() => handleSocialLogin('github')}>
-                        <Github className="h-5 w-5" />
-                        GitHub
                     </Button>
                 </div>
 

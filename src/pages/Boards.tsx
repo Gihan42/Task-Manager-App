@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useBoard } from '../hooks/useBoard';
 import { motion } from 'framer-motion';
 
 export const Boards = () => {
-    const { boards, createBoard } = useBoard();
+    const { boards, createBoard, deleteBoard } = useBoard();
     const [isCreating, setIsCreating] = useState(false);
     const [newBoardTitle, setNewBoardTitle] = useState('');
 
@@ -55,10 +55,11 @@ export const Boards = () => {
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: index * 0.05 }}
+                            className="relative group h-48"
                         >
                             <Link 
                                 to={`/board/${board.id}`}
-                                className="group relative block h-48 rounded-2xl border border-border bg-card/50 backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 overflow-hidden"
+                                className="block h-full w-full rounded-2xl border border-border bg-card/50 backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 overflow-hidden"
                                 style={{ textDecoration: 'none' }}
                             >
                                 <div 
@@ -78,6 +79,31 @@ export const Boards = () => {
                                     ))}
                                 </div>
                             </Link>
+
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (window.confirm(`Are you sure you want to delete "${board.title}"? This action cannot be undone.`)) {
+                                        deleteBoard(board.id);
+                                    }
+                                }}
+                                className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+                                style={{ 
+                                    position: 'absolute', 
+                                    top: '12px', 
+                                    right: '12px', 
+                                    zIndex: 50,
+                                    background: 'none',
+                                    border: 'none',
+                                    outline: 'none',
+                                    padding: 0,
+                                    color: 'inherit'
+                                }}
+                                title="Delete Board"
+                            >
+                                <Trash2 className="w-6 h-6 text-gray-500 hover:text-red-500 transition-colors" />
+                            </button>
                         </motion.div>
                     ))}
                     

@@ -9,6 +9,7 @@ export interface Task {
   testingAt?: string;
   testingDoneAt?: string;
   doneAt?: string;
+  createdAt?: string;
 }
 
 export interface List {
@@ -22,4 +23,6 @@ export interface Board {
   title: string;
   color: string;
   lists: List[];
+  ownerId: string;
+  members: string[];
 }

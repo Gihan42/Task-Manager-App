@@ -4,19 +4,26 @@ import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from "./components/ThemeProvider"
 import { BoardProvider } from "./context/BoardContext"
 import { TeamProvider } from "./context/TeamContext.tsx"
+import { AuthProvider } from './context/AuthContext.tsx'
+import { ToastProvider } from './context/ToastContext.tsx'
 import './index.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <BoardProvider>
-        <TeamProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </TeamProvider>
-      </BoardProvider>
+      <ToastProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <BoardProvider>
+              <TeamProvider>
+                <App />
+              </TeamProvider>
+            </BoardProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </ToastProvider>
     </ThemeProvider>
   </StrictMode>,
 )
+

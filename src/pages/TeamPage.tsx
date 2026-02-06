@@ -4,10 +4,12 @@ import { UserPlus, Trash2, X, Search, Check, Shield, Briefcase } from 'lucide-re
 import { TextField, InputAdornment, Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Checkbox, ListItemText, FormControl, InputLabel } from '@mui/material';
 import { type TeamMember, type Role } from '../context/team-context';
 import { useTeam } from '../hooks/useTeam';
+import { useAuth } from '../context/AuthContext';
 import { useBoard } from '../hooks/useBoard';
+import defaultRoles from '../data/roles.json';
 import { Button } from '../components/ui/Button';
 
-const AVAILABLE_ROLES: Role[] = ['Manager', 'TechLead', 'Developer', 'Designer', 'Tester'];
+const AVAILABLE_ROLES: Role[] = defaultRoles.availableRoles;
 
 export const Team = () => {
   const { members, addMember, removeMember, updateMemberRoles, assignMemberToBoard, removeMemberFromBoard } = useTeam();
@@ -22,7 +24,7 @@ export const Team = () => {
   const [newMember, setNewMember] = useState({
     name: '',
     email: '',
-    roles: ['Developer'] as Role[],
+    roles: [defaultRoles.availableRoles[0]] as Role[],
   });
 
   // State for editing member roles
@@ -33,11 +35,19 @@ export const Team = () => {
     member.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const { user } = useAuth();
+  
+  // Check if current user is a manager
+  const currentUserMember = members.find(m => user && m.id === user.uid);
+  const isManager = currentUserMember?.roles.includes('Manager');
+
   const handleAddMember = () => {
-    if (newMember.name && newMember.email && newMember.roles.length > 0) {
+    if (newMember.name && newMember.roles.length > 0) {
       addMember(newMember);
-      setNewMember({ name: '', email: '', roles: ['Developer'] });
+      setNewMember({ name: '', email: '', roles: [defaultRoles.availableRoles[0]] });
       setShowAddModal(false);
+    } else {
+        // Optional: Add toast warning if name is missing
     }
   };
 
@@ -96,13 +106,15 @@ export const Team = () => {
             </p>
           </div>
           <div className="flex gap-3">
-            <Button
-                onClick={() => setShowAddModal(true)}
-                className="inline-flex items-center gap-2 shadow-lg hover:scale-105 transition-transform bg-primary hover:bg-primary/90"
-            >
-                <UserPlus size={18} />
-                Add Member
-            </Button>
+            {isManager && (
+                <Button
+                    onClick={() => setShowAddModal(true)}
+                    className="inline-flex items-center gap-2 shadow-lg hover:scale-105 transition-transform bg-primary hover:bg-primary/90"
+                >
+                    <UserPlus size={18} />
+                    Add Member
+                </Button>
+            )}
           </div>
         </div>
 
@@ -160,7 +172,7 @@ export const Team = () => {
                         <th className="p-4 font-semibold text-sm text-foreground">Member</th>
                         <th className="p-4 font-semibold text-sm text-foreground">Role</th>
                         <th className="p-4 font-semibold text-sm text-foreground">Projects</th>
-                        <th className="p-4 font-semibold text-sm text-foreground text-right">Actions</th>
+                        <th className="p-4 font-semibold text-sm text-foreground text-right">{isManager ? 'Actions' : ''}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -213,29 +225,31 @@ export const Team = () => {
                                 </div>
                             </td>
                             <td className="p-4 text-right">
-                                <div className="flex items-center justify-end gap-2">
-                                    <button 
-                                        onClick={() => setShowAssignModal(member.id)}
-                                        className="p-2 rounded hover:bg-muted dark:bg-muted dark:text-foreground text-muted-foreground hover:text-primary transition-colors"
-                                        title="Assign Project"
-                                    >
-                                        <Briefcase size={16} />
-                                    </button>
-                                    <button 
-                                        onClick={() => openEditModal(member)}
-                                        className="p-2 rounded hover:bg-muted dark:bg-muted dark:text-foreground text-muted-foreground hover:text-primary transition-colors"
-                                        title="Edit Roles"
-                                    >
-                                        <Shield size={16} />
-                                    </button>
-                                    <button 
-                                        onClick={() => removeMember(member.id)}
-                                        className="p-2 rounded hover:bg-red-500/10 dark:bg-muted dark:text-foreground text-muted-foreground hover:text-red-500 transition-colors"
-                                        title="Delete"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
-                                </div>
+                                {isManager && (
+                                    <div className="flex items-center justify-end gap-2">
+                                        <button 
+                                            onClick={() => setShowAssignModal(member.id)}
+                                            className="p-2 rounded hover:bg-muted dark:bg-muted dark:text-foreground text-muted-foreground hover:text-primary transition-colors"
+                                            title="Assign Project"
+                                        >
+                                            <Briefcase size={16} />
+                                        </button>
+                                        <button 
+                                            onClick={() => openEditModal(member)}
+                                            className="p-2 rounded hover:bg-muted dark:bg-muted dark:text-foreground text-muted-foreground hover:text-primary transition-colors"
+                                            title="Edit Roles"
+                                        >
+                                            <Shield size={16} />
+                                        </button>
+                                        <button 
+                                            onClick={() => removeMember(member.id)}
+                                            className="p-2 rounded hover:bg-red-500/10 dark:bg-muted dark:text-foreground text-muted-foreground hover:text-red-500 transition-colors"
+                                            title="Delete"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                )}
                             </td>
                         </tr>
                     ))}
@@ -467,7 +481,8 @@ export const Team = () => {
                                         if (isAssigned) {
                                             removeMemberFromBoard(showAssignModal, board.id);
                                         } else {
-                                            assignMemberToBoard(showAssignModal, board.id);
+                                            // Default to first role (e.g. 'Manager' or 'Developer') when assigning
+                                            assignMemberToBoard(showAssignModal, board.id, defaultRoles.availableRoles[2] || 'Developer');
                                         }
                                     }}
                                     className={`

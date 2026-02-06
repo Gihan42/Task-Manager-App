@@ -1,0 +1,10 @@
+{
+  "availableRoles": [
+    "Manager",
+    "TechLead",
+    "Developer",
+    "Designer",
+    "Tester"
+  ],
+  "description": "Default application roles"
+}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MoreHorizontal, Plus, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { TextField, IconButton, Button as MuiButton } from '@mui/material';
 import { Edit as EditIcon, Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
@@ -106,16 +106,7 @@ export const Board = () => {
                     </div>
                 </div>
                 <div className="flex items-center gap-3 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                    <Button variant="outline" size="sm" className="hidden sm:flex hover:bg-muted/80 shadow-sm border-dashed">
-                        Filter
-                    </Button>
-                    <div className="h-6 w-px bg-border hidden sm:block"></div>
-                    <Button variant="outline" size="sm" className="shadow-sm hover:border-primary/50 transition-colors">
-                        Share board
-                    </Button>
-                    <Button size="sm" className="shadow-md bg-primary hover:bg-primary/90 transition-all hover:scale-105">
-                        <MoreHorizontal size={16} />
-                    </Button>
+                   {/* Buttons removed as requested */}
                 </div>
             </header>
 
@@ -243,6 +234,10 @@ export const Board = () => {
                                                                                         {/* Show Assigned info everywhere except Done (per 'show only done date' request) */}
                                                                                         {list.title !== 'Done' && card.assignee && card.assignedBy && (
                                                                                              <div>Assigned by {card.assignedBy} {card.assignedAt && `on ${new Date(card.assignedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' })}`}</div>
+                                                                                        )}
+
+                                                                                        {list.title === 'To Do' && card.createdAt && (
+                                                                                            <div className="text-muted-foreground">Created: {new Date(card.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' })}</div>
                                                                                         )}
 
                                                                                         {list.title === 'In Progress' && card.inProgressAt && (
