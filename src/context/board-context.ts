@@ -7,7 +7,7 @@ export interface BoardContextType {
     createBoard: (title: string, color: string) => void;
     addList: (boardId: string, title: string) => void;
     addTask: (boardId: string, listId: string, content: string) => void;
-    moveTask: (boardId: string, sourceListId: string, destListId: string, sourceIndex: number, destIndex: number) => void;
+    moveTask: (boardId: string, sourceListId: string, destListId: string, sourceIndex: number, destIndex: number, movedBy?: string) => void;
     moveList: (boardId: string, sourceIndex: number, destIndex: number) => void;
     reorderLists: (boardId: string, newLists: List[]) => void;
     updateTaskOrder: (boardId: string, listId: string, newTasks: Task[]) => void;

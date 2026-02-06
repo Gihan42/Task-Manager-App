@@ -2,7 +2,7 @@ export interface Task {
   id: string;
   content: string;
   owner: string;
-  assignee?: string;
+  assignees?: string[];
   assignedAt?: string;
   assignedBy?: string;
   inProgressAt?: string;
@@ -10,6 +10,8 @@ export interface Task {
   testingDoneAt?: string;
   doneAt?: string;
   createdAt?: string;
+  lastMovedBy?: string;
+  lastMovedAt?: string;
 }
 
 export interface List {

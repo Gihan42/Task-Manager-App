@@ -83,7 +83,7 @@ export const Dashboard = () => {
                 >
                     <Link to="/boards">
                         <Button size="lg" className="px-8 py-6 text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all bg-primary hover:bg-primary/90 group">
-                            View Your Boards
+                            View Your Projects
                             <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
                         </Button>
                     </Link>
@@ -107,7 +107,7 @@ export const Dashboard = () => {
                                 <div className="p-2 rounded-lg bg-primary/10">
                                     <LayoutDashboard size={20} className="text-primary" />
                                 </div>
-                                <span className="font-medium">Total Boards</span>
+                                <span className="font-medium">Total Projects</span>
                             </div>
                             <div className="text-4xl font-bold gradient-text">{totalBoards}</div>
                             <div className="mt-2 text-sm text-muted-foreground">Active projects</div>
@@ -127,7 +127,7 @@ export const Dashboard = () => {
                                 <span className="font-medium">Total Tasks</span>
                             </div>
                             <div className="text-4xl font-bold gradient-text-blue">{totalTasks}</div>
-                            <div className="mt-2 text-sm text-muted-foreground">Across all boards</div>
+                            <div className="mt-2 text-sm text-muted-foreground">Across all projects</div>
                         </div>
                         <div className="stat-glow-blue" />
                     </motion.div>
@@ -193,9 +193,9 @@ export const Dashboard = () => {
                         <div className="inline-flex p-4 rounded-2xl bg-primary/10 mb-4">
                             <LayoutDashboard className="w-8 h-8 text-primary" />
                         </div>
-                        <h3 className="text-xl font-bold mb-2">Custom Boards</h3>
+                        <h3 className="text-xl font-bold mb-2">Custom Projects</h3>
                         <p className="text-muted-foreground">
-                            Create unlimited boards to organize your projects your way
+                            Create unlimited projects to organize your work your way
                         </p>
                     </motion.div>
 

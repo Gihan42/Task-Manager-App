@@ -34,6 +34,15 @@ export const Team = () => {
     member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     member.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
+  const totalPages = Math.ceil(filteredMembers.length / itemsPerPage);
+  const paginatedMembers = filteredMembers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const { user } = useAuth();
   
@@ -176,7 +185,7 @@ export const Team = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredMembers.map(member => (
+                    {paginatedMembers.map(member => (
                         <tr key={member.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                             <td className="p-4">
                                 <div className="flex items-center gap-3">
@@ -256,6 +265,36 @@ export const Team = () => {
                 </tbody>
             </table>
           </div>
+          
+          {/* Pagination Controls */}
+          {filteredMembers.length > 0 && (
+            <div className="flex items-center justify-between p-4 border-t border-border">
+                <div className="text-sm text-muted-foreground">
+                    Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredMembers.length)} to {Math.min(currentPage * itemsPerPage, filteredMembers.length)} of {filteredMembers.length} members
+                </div>
+                <div className="flex items-center gap-2">
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </Button>
+                    <div className="text-sm font-medium">
+                        Page {currentPage} of {totalPages}
+                    </div>
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </Button>
+                </div>
+            </div>
+          )}
       </motion.div>
 
       {/* Empty State */}

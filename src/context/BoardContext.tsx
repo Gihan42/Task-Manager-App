@@ -50,7 +50,12 @@ export const BoardProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             id: newBoardId,
             title,
             color,
-            lists: [],
+            lists: [
+                { id: crypto.randomUUID(), title: 'To Do', cards: [] },
+                { id: crypto.randomUUID(), title: 'In Progress', cards: [] },
+                { id: crypto.randomUUID(), title: 'Testing', cards: [] },
+                { id: crypto.randomUUID(), title: 'Done', cards: [] }
+            ],
             ownerId: user.uid,
             members: [user.uid]
         };
@@ -141,8 +146,8 @@ export const BoardProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     if (card.id !== taskId) return card;
                     
                     const finalUpdates = { ...updates };
-                    if ('assignee' in updates) {
-                        if (updates.assignee) {
+                    if ('assignees' in updates) {
+                        if (updates.assignees && updates.assignees.length > 0) {
                             finalUpdates.assignedAt = new Date().toISOString();
                             finalUpdates.assignedBy = 'Current User';
                         } else {
@@ -163,7 +168,7 @@ export const BoardProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
     };
 
-    const moveTask = async (boardId: string, sourceListId: string, destListId: string, sourceIndex: number, destIndex: number) => {
+    const moveTask = async (boardId: string, sourceListId: string, destListId: string, sourceIndex: number, destIndex: number, movedBy?: string) => {
         const board = boards.find(b => b.id === boardId);
         if (!board) return;
         
@@ -185,24 +190,28 @@ export const BoardProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             );
         } else {
             const newDestCards = Array.from(destList.cards);
-             const now = new Date().toISOString();
-             const updatedTask = { ...movedTask };
+            const now = new Date().toISOString();
+            const updatedTask = { 
+                ...movedTask,
+                lastMovedAt: now,
+                lastMovedBy: movedBy
+            };
 
-             if (destList.title === 'To Do') {
-                 updatedTask.doneAt = undefined;
-                 updatedTask.testingDoneAt = undefined;
-             } else if (destList.title === 'In Progress') {
-                 updatedTask.inProgressAt = now;
-                 updatedTask.doneAt = undefined;
-             } else if (destList.title === 'Testing') {
-                 updatedTask.testingAt = now;
-                 updatedTask.doneAt = undefined;
-             } else if (destList.title === 'Done') {
-                 updatedTask.doneAt = now;
-                 if (sourceList.title === 'Testing') {
-                     updatedTask.testingDoneAt = now;
-                 }
-             }
+            if (destList.title === 'To Do') {
+                updatedTask.doneAt = undefined;
+                updatedTask.testingDoneAt = undefined;
+            } else if (destList.title === 'In Progress') {
+                updatedTask.inProgressAt = now;
+                updatedTask.doneAt = undefined;
+            } else if (destList.title === 'Testing') {
+                updatedTask.testingAt = now;
+                updatedTask.doneAt = undefined;
+            } else if (destList.title === 'Done') {
+                updatedTask.doneAt = now;
+                if (sourceList.title === 'Testing') {
+                    updatedTask.testingDoneAt = now;
+                }
+            }
 
             newDestCards.splice(destIndex, 0, updatedTask);
 

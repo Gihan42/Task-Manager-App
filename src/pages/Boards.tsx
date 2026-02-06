@@ -27,7 +27,7 @@ export const Boards = () => {
 
     return (
         <div className="space-y-12 p-6 pb-20">
-            {/* Your Boards Section */}
+            {/* Your Projects Section */}
             <motion.section 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -37,14 +37,14 @@ export const Boards = () => {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50 mb-2">
-                            Your Boards
+                            Your Projects
                         </h1>
                         <p className="text-muted-foreground text-lg">
                             Jump right back into your work
                         </p>
                     </div>
                     <Button onClick={() => setIsCreating(true)} className="shadow-lg hover:scale-105 transition-transform bg-primary hover:bg-primary/90">
-                        <Plus className="mr-2 h-4 w-4" /> Create Board
+                        <Plus className="mr-2 h-4 w-4" /> Create Project
                     </Button>
                 </div>
 
@@ -70,7 +70,7 @@ export const Boards = () => {
                                     {board.title}
                                 </h3>
                                 <p className="text-sm text-muted-foreground">
-                                    {board.lists.length} Lists • {board.lists.reduce((acc, l) => acc + l.cards.length, 0)} Tasks
+                                    {board.lists.length} Sections • {board.lists.reduce((acc, l) => acc + l.cards.length, 0)} Tasks
                                 </p>
                                 <div className="absolute bottom-6 left-6 flex gap-1">
                                     {/* Mini visualization of lists */}
@@ -100,7 +100,7 @@ export const Boards = () => {
                                     padding: 0,
                                     color: 'inherit'
                                 }}
-                                title="Delete Board"
+                                title="Delete Project"
                             >
                                 <Trash2 className="w-6 h-6 text-gray-500 hover:text-red-500 transition-colors" />
                             </button>
@@ -117,7 +117,7 @@ export const Boards = () => {
                         <div className="p-4 rounded-full bg-background/50 group-hover:bg-primary/10 transition-colors mb-3 shadow-sm">
                             <Plus className="h-8 w-8 text-muted-foreground group-hover:text-primary" />
                         </div>
-                        <span className="font-medium text-muted-foreground group-hover:text-primary">Create New Board</span>
+                        <span className="font-medium text-muted-foreground group-hover:text-primary">Create New Project</span>
                     </motion.button>
                 </div>
             </motion.section>
@@ -129,8 +129,8 @@ export const Boards = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         className="bg-card p-8 rounded-2xl shadow-2xl w-full max-w-md border border-border"
                     >
-                        <h3 className="text-2xl font-bold mb-2">Create New Board</h3>
-                        <p className="text-muted-foreground mb-6">Give your new board a name to get started.</p>
+                        <h3 className="text-2xl font-bold mb-2">Create New Project</h3>
+                        <p className="text-muted-foreground mb-6">Give your new project a name to get started.</p>
                         <form onSubmit={handleCreateBoard}>
                             <input
                                 type="text"
@@ -142,7 +142,7 @@ export const Boards = () => {
                             />
                             <div className="flex justify-end gap-3">
                                 <Button type="button" variant="ghost" onClick={() => setIsCreating(false)}>Cancel</Button>
-                                <Button type="submit" className="px-6">Create Board</Button>
+                                <Button type="submit" className="px-6">Create Project</Button>
                             </div>
                         </form>
                     </motion.div>
