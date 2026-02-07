@@ -12,6 +12,11 @@
       "Manager",
       "TechLead",
       "Project Manager"
+    ],
+    "canAccessTeamPage": [
+      "Manager",
+      "TechLead",
+      "Project Manager"
     ]
   },
   "description": "Default application roles and permissions"

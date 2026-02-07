@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserPlus, Trash2, X, Search, Check, Shield, Briefcase } from 'lucide-react';
+import { UserPlus, Trash2, X, Search, Check, Shield, Briefcase, ShieldAlert, ArrowLeft } from 'lucide-react';
 import { TextField, InputAdornment, Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Checkbox, ListItemText, FormControl, InputLabel } from '@mui/material';
 import { type TeamMember, type Role } from '../context/team-context';
 import { useTeam } from '../hooks/useTeam';
@@ -8,17 +8,23 @@ import { useAuth } from '../context/AuthContext';
 import { useBoard } from '../hooks/useBoard';
 import defaultRoles from '../data/roles.json';
 import { Button } from '../components/ui/Button';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { Link } from 'react-router-dom';
 
 const AVAILABLE_ROLES: Role[] = defaultRoles.availableRoles;
 
 export const Team = () => {
   const { members, addMember, removeMember, updateMemberRoles, assignMemberToBoard, removeMemberFromBoard } = useTeam();
   const { boards } = useBoard();
+  const { user } = useAuth();
   
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState<string | null>(null); // Member ID for role editing
   const [showAssignModal, setShowAssignModal] = useState<string | null>(null); // Member ID for board assignment
   const [searchQuery, setSearchQuery] = useState('');
+  const [userRoles, setUserRoles] = useState<string[]>([]);
+  const [loadingAccess, setLoadingAccess] = useState(true);
   
   // State for adding new member
   const [newMember, setNewMember] = useState({
@@ -29,6 +35,41 @@ export const Team = () => {
 
   // State for editing member roles
   const [editingRoles, setEditingRoles] = useState<Role[]>([]);
+
+  // Fetch user roles from Firestore
+  useEffect(() => {
+    const fetchUserRoles = async () => {
+      if (!user) {
+        setUserRoles([]);
+        setLoadingAccess(false);
+        return;
+      }
+
+      try {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setUserRoles(userData.roles || []);
+        } else {
+          setUserRoles([]);
+        }
+      } catch (error) {
+        console.error('Error fetching user roles:', error);
+        setUserRoles([]);
+      } finally {
+        setLoadingAccess(false);
+      }
+    };
+
+    fetchUserRoles();
+  }, [user]);
+
+  // Check if user has permission to access team page
+  const hasTeamAccess = userRoles.some(role => 
+    defaultRoles.permissions.canAccessTeamPage.includes(role)
+  );
 
   const filteredMembers = members.filter(member =>
     member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -43,12 +84,6 @@ export const Team = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  const { user } = useAuth();
-  
-  // Check if current user is a manager
-  const currentUserMember = members.find(m => user && m.id === user.uid);
-  const isManager = currentUserMember?.roles.includes('Manager');
 
   const handleAddMember = () => {
     if (newMember.name && newMember.roles.length > 0) {
@@ -97,6 +132,48 @@ export const Team = () => {
       .slice(0, 2);
   };
 
+  // Show loading state
+  if (loadingAccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'hsl(var(--background))' }}>
+        <div className="text-center">
+          <div className="text-lg text-muted-foreground">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show access denied message if user doesn't have permission
+  if (!hasTeamAccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-8" style={{ background: 'hsl(var(--background))' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-md"
+        >
+          <div className="mb-6 flex justify-center">
+            <div className="p-6 rounded-full bg-destructive/10">
+              <ShieldAlert className="w-16 h-16 text-destructive" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold mb-4" style={{ color: 'hsl(var(--foreground))' }}>
+            Access Denied
+          </h1>
+          <p className="text-lg text-muted-foreground mb-8">
+            You don't have permission to access the Team Management page. Only Manager, TechLead, and Project Manager roles can manage teams.
+          </p>
+          <Link to="/">
+            <Button className="inline-flex items-center gap-2">
+              <ArrowLeft size={18} />
+              Back to Dashboard
+            </Button>
+          </Link>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen p-8" style={{ background: 'hsl(var(--background))' }}>
       {/* Header */}
@@ -115,7 +192,7 @@ export const Team = () => {
             </p>
           </div>
           <div className="flex gap-3">
-            {isManager && (
+            {hasTeamAccess && (
                 <Button
                     onClick={() => setShowAddModal(true)}
                     className="inline-flex items-center gap-2 shadow-lg hover:scale-105 transition-transform bg-primary hover:bg-primary/90"
@@ -181,7 +258,7 @@ export const Team = () => {
                         <th className="p-4 font-semibold text-sm text-foreground">Member</th>
                         <th className="p-4 font-semibold text-sm text-foreground">Role</th>
                         <th className="p-4 font-semibold text-sm text-foreground">Projects</th>
-                        <th className="p-4 font-semibold text-sm text-foreground text-right">{isManager ? 'Actions' : ''}</th>
+                        <th className="p-4 font-semibold text-sm text-foreground text-right">{hasTeamAccess ? 'Actions' : ''}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -234,7 +311,7 @@ export const Team = () => {
                                 </div>
                             </td>
                             <td className="p-4 text-right">
-                                {isManager && (
+                                {hasTeamAccess && (
                                     <div className="flex items-center justify-end gap-2">
                                         <button 
                                             onClick={() => setShowAssignModal(member.id)}
