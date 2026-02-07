@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { type User, onAuthStateChanged, signOut, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { type User, onAuthStateChanged, signOut, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from 'firebase/auth';
 import { doc, getDoc, writeBatch } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import defaultRoles from '../data/roles.json';
@@ -12,6 +12,7 @@ interface AuthContextType {
     signup: (email: string, password: string, name: string) => Promise<void>;
     login: (email: string, password: string) => Promise<void>;
     loginWithGoogle: () => Promise<void>;
+    resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -93,6 +94,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    const resetPassword = async (email: string) => {
+        await sendPasswordResetEmail(auth, email);
+    };
+
     const checkCreateUserDoc = async (user: User) => {
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
@@ -137,7 +142,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, logout, signup, login, loginWithGoogle }}>
+        <AuthContext.Provider value={{ user, loading, logout, signup, login, loginWithGoogle, resetPassword }}>
             {!loading && children}
         </AuthContext.Provider>
     );
