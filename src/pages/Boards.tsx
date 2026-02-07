@@ -1,14 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useBoard } from '../hooks/useBoard';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import rolesConfig from '../data/roles.json';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 export const Boards = () => {
     const { boards, createBoard, deleteBoard } = useBoard();
+    const { user } = useAuth();
     const [isCreating, setIsCreating] = useState(false);
     const [newBoardTitle, setNewBoardTitle] = useState('');
+    const [userRoles, setUserRoles] = useState<string[]>([]);
+
+    // Fetch user roles from Firestore
+    useEffect(() => {
+        const fetchUserRoles = async () => {
+            if (!user) {
+                setUserRoles([]);
+                return;
+            }
+
+            try {
+                const userDocRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userDocRef);
+                
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    setUserRoles(userData.roles || []);
+                } else {
+                    setUserRoles([]);
+                }
+            } catch (error) {
+                console.error('Error fetching user roles:', error);
+                setUserRoles([]);
+            }
+        };
+
+        fetchUserRoles();
+    }, [user]);
+
+    // Check if user has permission to create projects
+    const canCreateProject = userRoles.some(role => 
+        rolesConfig.permissions.canAddNewProject.includes(role)
+    );
 
     const handleCreateBoard = (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,9 +81,11 @@ export const Boards = () => {
                             Jump right back into your work
                         </p>
                     </div>
-                    <Button onClick={() => setIsCreating(true)} className="shadow-lg hover:scale-105 transition-transform bg-primary hover:bg-primary/90">
-                        <Plus className="mr-2 h-4 w-4" /> Create Project
-                    </Button>
+                    {canCreateProject && (
+                        <Button onClick={() => setIsCreating(true)} className="shadow-lg hover:scale-105 transition-transform bg-primary hover:bg-primary/90">
+                            <Plus className="mr-2 h-4 w-4" /> Create Project
+                        </Button>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -107,18 +147,20 @@ export const Boards = () => {
                         </motion.div>
                     ))}
                     
-                    <motion.button 
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: boards.length * 0.05 }}
-                        onClick={() => setIsCreating(true)}
-                        className="flex h-48 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/20 transition-all hover:bg-muted/40 hover:border-primary/50 hover:scale-[1.02] group cursor-pointer"
-                    >
-                        <div className="p-4 rounded-full bg-background/50 group-hover:bg-primary/10 transition-colors mb-3 shadow-sm">
-                            <Plus className="h-8 w-8 text-muted-foreground group-hover:text-primary" />
-                        </div>
-                        <span className="font-medium text-muted-foreground group-hover:text-primary">Create New Project</span>
-                    </motion.button>
+                    {canCreateProject && (
+                        <motion.button 
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: boards.length * 0.05 }}
+                            onClick={() => setIsCreating(true)}
+                            className="flex h-48 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/20 transition-all hover:bg-muted/40 hover:border-primary/50 hover:scale-[1.02] group cursor-pointer"
+                        >
+                            <div className="p-4 rounded-full bg-background/50 group-hover:bg-primary/10 transition-colors mb-3 shadow-sm">
+                                <Plus className="h-8 w-8 text-muted-foreground group-hover:text-primary" />
+                            </div>
+                            <span className="font-medium text-muted-foreground group-hover:text-primary">Create New Project</span>
+                        </motion.button>
+                    )}
                 </div>
             </motion.section>
 

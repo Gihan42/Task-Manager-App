@@ -7,5 +7,12 @@
     "Tester",
     "Project Manager"
   ],
-  "description": "Default application roles"
+  "permissions": {
+    "canAddNewProject": [
+      "Manager",
+      "TechLead",
+      "Project Manager"
+    ]
+  },
+  "description": "Default application roles and permissions"
 }

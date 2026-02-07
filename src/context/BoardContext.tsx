@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { Board, List, Task } from '../types';
 import { BoardContext } from './board-context';
 import defaultRoles from '../data/roles.json';
-import { collection, onSnapshot, doc, updateDoc, query, writeBatch, where, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, query, writeBatch, where, getDocs, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
@@ -39,6 +39,33 @@ export const BoardProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const createBoard = async (title: string, color: string) => {
         if (!user) {
             toast.error("Please log in to create a board");
+            return;
+        }
+
+        // Check user permissions
+        try {
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDoc = await getDoc(userDocRef);
+            
+            if (!userDoc.exists()) {
+                toast.error("User profile not found");
+                return;
+            }
+
+            const userData = userDoc.data();
+            const userRoles = userData.roles || [];
+            
+            // Check if user has permission to create projects
+            const canCreateProject = userRoles.some((role: string) => 
+                defaultRoles.permissions.canAddNewProject.includes(role)
+            );
+
+            if (!canCreateProject) {
+                toast.error("You don't have permission to create projects. Only Manager, TechLead, and Project Manager roles can create projects.");
+                return;
+            }
+        } catch (error: any) {
+            toast.error(`Permission check failed: ${error.message}`);
             return;
         }
 
