@@ -178,8 +178,9 @@ export const BoardProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                             finalUpdates.assignedAt = new Date().toISOString();
                             finalUpdates.assignedBy = 'Current User';
                         } else {
-                            finalUpdates.assignedAt = undefined;
-                            finalUpdates.assignedBy = undefined;
+                            // Remove assignment fields when no assignees
+                            delete finalUpdates.assignedAt;
+                            delete finalUpdates.assignedBy;
                         }
                     }
 
@@ -225,14 +226,14 @@ export const BoardProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             };
 
             if (destList.title === 'To Do') {
-                updatedTask.doneAt = undefined;
-                updatedTask.testingDoneAt = undefined;
+                delete updatedTask.doneAt;
+                delete updatedTask.testingDoneAt;
             } else if (destList.title === 'In Progress') {
                 updatedTask.inProgressAt = now;
-                updatedTask.doneAt = undefined;
+                delete updatedTask.doneAt;
             } else if (destList.title === 'Testing') {
                 updatedTask.testingAt = now;
-                updatedTask.doneAt = undefined;
+                delete updatedTask.doneAt;
             } else if (destList.title === 'Done') {
                 updatedTask.doneAt = now;
                 if (sourceList.title === 'Testing') {
