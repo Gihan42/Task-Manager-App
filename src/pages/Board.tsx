@@ -139,9 +139,7 @@ export const Board = () => {
                         <h1 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60 animate-fade-in">
                             {board.title}
                         </h1>
-                        <p className="text-xs text-muted-foreground font-medium animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                            Last updated just now
-                        </p>
+    
                     </div>
                 </div>
                 <div className="flex items-center gap-3 animate-fade-in" style={{ animationDelay: '0.2s' }}>

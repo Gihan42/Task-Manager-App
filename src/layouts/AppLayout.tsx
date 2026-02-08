@@ -150,8 +150,14 @@ export const AppLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="main-content" style={{ flex: 1, minWidth: 0, background: 'transparent', position: 'relative', zIndex: 10 }}>
-        <header className="flex justify-between items-center mb-8 animate-fade-in">
+      <main className="main-content" style={{ flex: 1, minWidth: 0, background: 'transparent', position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column' }}>
+        <header className="flex justify-between items-center px-4 py-4 mb-4 animate-fade-in" style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+          backgroundColor: 'transparent',
+          flexShrink: 0
+        }}>
             <h2 className="text-xl font-bold">Welcome back, {user?.displayName?.split(' ')[0] || 'User'}!</h2>
             <div className="flex items-center gap-4">
                 <ModeToggle />
@@ -164,7 +170,7 @@ export const AppLayout = () => {
                 )}
             </div>
         </header>
-        <div className="animate-slide-up">
+        <div className="animate-slide-up" style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
             <Outlet />
         </div>
       </main>
