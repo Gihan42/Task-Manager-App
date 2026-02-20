@@ -23,7 +23,7 @@ import {
   Download as DownloadIcon,
   OpenInNew as OpenInNewIcon,
 } from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
+
 import type { Task, AttachedFile } from '../types';
 import { useToast } from '../context/ToastContext';
 
@@ -43,7 +43,6 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
   onSave,
   readOnly = false,
 }) => {
-  const theme = useTheme();
   const { success, error: toastError } = useToast();
 
   const [content, setContent] = useState(task.content);
