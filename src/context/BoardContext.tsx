@@ -84,7 +84,8 @@ export const BoardProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 { id: crypto.randomUUID(), title: 'Done', cards: [] }
             ],
             ownerId: user.uid,
-            members: [user.uid]
+            members: [user.uid],
+            createdAt: new Date().toISOString()
         };
 
         batch.set(newBoardRef, newBoard);
@@ -193,6 +194,23 @@ export const BoardProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             await updateDoc(doc(db, "projects", boardId), { lists: newLists });
         } catch (error: any) {
             toast.error(`Failed to update task: ${error.message}`);
+        }
+    };
+
+    const deleteTask = async (boardId: string, listId: string, taskId: string) => {
+        const board = boards.find(b => b.id === boardId);
+        if (!board) return;
+
+        const newLists = board.lists.map(list => {
+            if (list.id !== listId) return list;
+            return { ...list, cards: list.cards.filter(card => card.id !== taskId) };
+        });
+
+        try {
+            await updateDoc(doc(db, "projects", boardId), { lists: newLists });
+            toast.success('Card deleted');
+        } catch (error: any) {
+            toast.error(`Failed to delete card: ${error.message}`);
         }
     };
 
@@ -334,7 +352,8 @@ export const BoardProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             updateTaskOrder,
             updateTask,
             updateBoard,
-            deleteBoard
+            deleteBoard,
+            deleteTask
         }}>
             {children}
         </BoardContext.Provider>

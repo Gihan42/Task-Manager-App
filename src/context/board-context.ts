@@ -14,6 +14,7 @@ export interface BoardContextType {
     updateTask: (boardId: string, listId: string, taskId: string, updates: Partial<Task>) => void;
     updateBoard: (boardId: string, updates: Partial<Board>) => void;
     deleteBoard: (boardId: string) => Promise<void>;
+    deleteTask: (boardId: string, listId: string, taskId: string) => Promise<void>;
 }
 
 export const BoardContext = createContext<BoardContextType>({
@@ -28,5 +29,6 @@ export const BoardContext = createContext<BoardContextType>({
     updateTask: () => {},
     updateBoard: () => {},
     deleteBoard: async () => {},
+    deleteTask: async () => {},
 });
 

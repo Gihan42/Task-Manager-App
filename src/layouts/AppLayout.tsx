@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, KanbanSquare, Users, LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, KanbanSquare, Users, LogOut, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import { ModeToggle } from '../components/ModeToggle';
 import { useAuth } from '../context/AuthContext';
 
@@ -24,6 +24,7 @@ export const AppLayout = () => {
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
     { icon: KanbanSquare, label: 'Boards', path: '/boards' },
+    { icon: FileText, label: 'Project Files', path: '/project-files' },
     { icon: Users, label: 'Team', path: '/team' },
   ];
 

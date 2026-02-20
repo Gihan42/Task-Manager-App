@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Plus, X } from 'lucide-react';
+import { TaskDialog } from '../components/TaskDialog';
 import { TextField, IconButton, Button as MuiButton, Select, MenuItem, Checkbox, ListItemText, Avatar, Tooltip } from '@mui/material';
-import { Edit as EditIcon, Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
+import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import { Button } from '../components/ui/Button';
 import { useBoard } from '../hooks/useBoard';
@@ -12,15 +13,16 @@ import { useAuth } from '../context/AuthContext';
 export const Board = () => {
     const { boardId } = useParams();
     const navigate = useNavigate();
-    const { boards, addList, addTask, moveTask, moveList, updateTask } = useBoard();
+    const { boards, addList, addTask, moveTask, moveList, updateTask, deleteTask } = useBoard();
     const { members } = useTeam();
     const { user } = useAuth();
     const [newListTitle, setNewListTitle] = useState('');
     const [isAddingList, setIsAddingList] = useState(false);
     const [addingCardToList, setAddingCardToList] = useState<string | null>(null);
     const [newCardContent, setNewCardContent] = useState('');
-    const [editingCardId, setEditingCardId] = useState<string | null>(null);
-    const [editContent, setEditContent] = useState('');
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<{task: any, listId: string} | null>(null);
+    const [confirmDelete, setConfirmDelete] = useState<{cardId: string, listId: string, title: string} | null>(null);
 
     const board = boards.find(b => b.id === boardId);
 
@@ -32,6 +34,10 @@ export const Board = () => {
     const currentUserMember = members.find(m => m.id === user?.uid);
     // Check if user has ANY of the allowed roles
     const hasPermission = currentUserMember?.roles.some(role => allowedRoles.includes(role)) ?? false;
+    // Check if user is assigned to this board
+    const isAssignedToBoard = boardId ? (currentUserMember?.assignedBoardIds.includes(boardId) ?? false) : false;
+    // Can add cards: privileged roles OR assigned to the board
+    const canAddCard = hasPermission || isAssignedToBoard;
 
     if (!board) {
         return (
@@ -96,18 +102,19 @@ export const Board = () => {
         setAddingCardToList(null);
     };
 
-    const startEditing = (cardId: string, content: string) => {
-        if (!hasPermission) return;
-        setEditingCardId(cardId);
-        setEditContent(content);
+    const handleTaskClick = (task: any, listId: string) => {
+        setSelectedTask({ task, listId });
+        setDialogOpen(true);
     };
 
-    const saveCard = (listId: string, cardId: string) => {
-        if (editContent.trim() !== '') {
-            updateTask(board.id, listId, cardId, { content: editContent });
+    const handleSaveTask = async (taskId: string, updates: any) => {
+        if (selectedTask) {
+           await updateTask(board.id, selectedTask.listId, taskId, updates);
+           
+           // Update local state if needed OR rely on board context updates. 
+           // Since updateTask likely triggers a re-fetch or snapshot update, we might not need manual state update if using real-time listener.
+           // But assuming updateTask is async and returns, we are good.
         }
-        setEditingCardId(null);
-        setEditContent('');
     };
 
     const getInitials = (name: string) => {
@@ -197,7 +204,7 @@ export const Board = () => {
                                                                 const canMove = hasPermission || isAssigned;
 
                                                                 return (
-                                                                <Draggable key={card.id} draggableId={card.id} index={index} isDragDisabled={editingCardId === card.id || !canMove}>
+                                                                <Draggable key={card.id} draggableId={card.id} index={index} isDragDisabled={!canMove}>
                                                                     {(provided, snapshot) => (
                                                                         <div
                                                                             ref={provided.innerRef}
@@ -205,66 +212,50 @@ export const Board = () => {
                                                                             {...provided.dragHandleProps}
                                                                              className={`bg-card/40 backdrop-blur-xl p-4 rounded-2xl shadow-lg border border-border/40 text-sm hover:border-primary/70 hover:shadow-lg transition-all ${snapshot.isDragging ? 'shadow-2xl rotate-2 bg-card/60' : ''}`}
                                                                         >
-                                                                            <div className="mb-3 group relative">
-                                                                                {/* ... (Edit mode logic same as before) ... */}
-{editingCardId === card.id ? (
-                                                                                    <div className="flex gap-2 items-start">
-                                                                                        <TextField 
-                                                                                            fullWidth
-                                                                                            multiline
-                                                                                            size="small"
-                                                                                            value={editContent}
-                                                                                            onChange={(e) => setEditContent(e.target.value)}
-                                                                                            autoFocus
-                                                                                            sx={{
-                                                                                                '& .MuiInputBase-root': { 
-                                                                                                    color: 'hsl(var(--foreground))',
-                                                                                                    backgroundColor: 'hsl(var(--background))',
-                                                                                                    fontSize: '0.875rem',
-                                                                                                },
-                                                                                                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'hsl(var(--primary))' },
-                                                                                            }}
-                                                                                            onKeyDown={(e) => {
-                                                                                                if (e.key === 'Enter' && !e.shiftKey) {
-                                                                                                    e.preventDefault();
-                                                                                                    saveCard(list.id, card.id);
-                                                                                                }
-                                                                                            }}
-                                                                                        />
-                                                                                        <div className="flex flex-col">
-                                                                                            <IconButton 
-                                                                                                onClick={() => saveCard(list.id, card.id)}
-                                                                                                size="small"
-                                                                                                className="text-emerald-700 dark:text-green-400 hover:text-emerald-800 dark:hover:text-green-300 hover:bg-emerald-500/10"
-                                                                                            >
-                                                                                                <CheckIcon fontSize="small" />
-                                                                                            </IconButton>
-                                                                                            <IconButton 
-                                                                                                onClick={() => setEditingCardId(null)}
-                                                                                                size="small"
-                                                                                                className="text-slate-700 dark:text-white hover:text-red-600 dark:hover:text-red-400 hover:bg-red-500/10"
-                                                                                            >
-                                                                                                <CloseIcon fontSize="small" />
-                                                                                            </IconButton>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                ) : (
+                                                                                <div className="group relative">
                                                                                     <div className="flex justify-between items-start gap-2">
-                                                                                        <span className="break-words w-full">{card.content}</span>
-                                                                                        {hasPermission && (
-                                                                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                                                        <span 
+                                                                                            className="break-words w-full cursor-pointer hover:text-primary transition-colors"
+                                                                                            onClick={() => handleTaskClick(card, list.id)}
+                                                                                        >
+                                                                                            {card.content}
+                                                                                        </span>
+                                                                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-0.5 shrink-0">
+                                                                                            {canAddCard && (
                                                                                                 <IconButton 
-                                                                                                    onClick={() => startEditing(card.id, card.content)}
+                                                                                                    onClick={() => handleTaskClick(card, list.id)}
                                                                                                     size="small"
                                                                                                     className="text-slate-700 dark:text-white hover:text-primary hover:bg-primary/10"
                                                                                                 >
                                                                                                     <EditIcon fontSize="small" />
                                                                                                 </IconButton>
+                                                                                            )}
+                                                                                            {hasPermission && (
+                                                                                                <IconButton
+                                                                                                    size="small"
+                                                                                                    onClick={(e) => { e.stopPropagation(); setConfirmDelete({ cardId: card.id, listId: list.id, title: card.content }); }}
+                                                                                                    sx={{ color: 'rgba(0,0,0,0.5)', '&:hover': { color: '#111', backgroundColor: 'rgba(0,0,0,0.08)' } }}
+                                                                                                >
+                                                                                                    <DeleteIcon fontSize="small" />
+                                                                                                </IconButton>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    
+                                                                                    {/* Indicators for attachments/github */}
+                                                                                    <div className="flex gap-2 mt-1">
+                                                                                        {card.externalLink && (
+                                                                                            <div className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                                                                                Link
+                                                                                            </div>
+                                                                                        )}
+                                                                                        {card.files && card.files.length > 0 && (
+                                                                                            <div className="text-[10px] bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                                                                                {card.files.length} File{card.files.length > 1 ? 's' : ''}
                                                                                             </div>
                                                                                         )}
                                                                                     </div>
-                                                                                )}
-                                                                            </div>
+                                                                                </div>
                                                                             <div className="flex flex-col gap-2 pt-2 border-t border-border/50 text-xs">
                     
                                                                                 <div className="flex flex-col gap-1">
@@ -366,7 +357,7 @@ export const Board = () => {
                                                             })}
                                                             {provided.placeholder}
                                                             
-                                                            {hasPermission && (
+                                                            {canAddCard && (
                                                                 addingCardToList === list.id ? (
                                                                     <div className="p-1 animate-in slide-in-from-top-2 duration-200">
                                                                         <textarea
@@ -484,6 +475,61 @@ export const Board = () => {
                     )}
                 </Droppable>
             </DragDropContext>
+            {selectedTask && board && (
+                <TaskDialog 
+                    open={dialogOpen}
+                    onClose={() => setDialogOpen(false)}
+                    task={selectedTask.task}
+                    listId={selectedTask.listId}
+                    onSave={handleSaveTask}
+                    readOnly={!canAddCard}
+                />
+            )}
+
+            {/* ── Confirm Delete Card Dialog ── */}
+            {confirmDelete && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center"
+                    style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+                    onClick={() => setConfirmDelete(null)}
+                >
+                    <div
+                        className="rounded-2xl border border-red-500/20 shadow-2xl p-6 max-w-sm w-full mx-4"
+                        style={{ backgroundColor: 'rgba(15,23,42,0.95)' }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="flex items-center gap-3 mb-3">
+                            <span style={{ fontSize: 28 }}>🗑️</span>
+                            <h2 className="text-white font-bold text-lg">Delete Card?</h2>
+                        </div>
+                        <p className="text-sm mb-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                            This will permanently delete:
+                        </p>
+                        <p className="text-white font-medium text-sm mb-5 line-clamp-2 bg-white/5 rounded-lg px-3 py-2">
+                            "{confirmDelete.title}"
+                        </p>
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={() => setConfirmDelete(null)}
+                                className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                                style={{ backgroundColor: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.12)' }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    await deleteTask(board!.id, confirmDelete.listId, confirmDelete.cardId);
+                                    setConfirmDelete(null);
+                                }}
+                                className="px-4 py-2 rounded-lg text-sm font-bold transition-colors"
+                                style={{ backgroundColor: '#ef4444', color: 'white' }}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
