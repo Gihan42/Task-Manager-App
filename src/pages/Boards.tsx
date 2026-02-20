@@ -120,30 +120,32 @@ export const Boards = () => {
                                 </div>
                             </Link>
 
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    if (window.confirm(`Are you sure you want to delete "${board.title}"? This action cannot be undone.`)) {
-                                        deleteBoard(board.id);
-                                    }
-                                }}
-                                className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
-                                style={{ 
-                                    position: 'absolute', 
-                                    top: '12px', 
-                                    right: '12px', 
-                                    zIndex: 50,
-                                    background: 'none',
-                                    border: 'none',
-                                    outline: 'none',
-                                    padding: 0,
-                                    color: 'inherit'
-                                }}
-                                title="Delete Project"
-                            >
-                                <Trash2 className="w-6 h-6 text-gray-500 hover:text-red-500 transition-colors" />
-                            </button>
+                            {canCreateProject && (
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        if (window.confirm(`Are you sure you want to delete "${board.title}"? This action cannot be undone.`)) {
+                                            deleteBoard(board.id);
+                                        }
+                                    }}
+                                    className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+                                    style={{ 
+                                        position: 'absolute', 
+                                        top: '12px', 
+                                        right: '12px', 
+                                        zIndex: 50,
+                                        background: 'none',
+                                        border: 'none',
+                                        outline: 'none',
+                                        padding: 0,
+                                        color: 'inherit'
+                                    }}
+                                    title="Delete Project"
+                                >
+                                    <Trash2 className="w-6 h-6 text-gray-500 hover:text-red-500 transition-colors" />
+                                </button>
+                            )}
                         </motion.div>
                     ))}
                     

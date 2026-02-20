@@ -34,10 +34,10 @@ export const Board = () => {
     const currentUserMember = members.find(m => m.id === user?.uid);
     // Check if user has ANY of the allowed roles
     const hasPermission = currentUserMember?.roles.some(role => allowedRoles.includes(role)) ?? false;
-    // Check if user is assigned to this board
+    // Check if user is assigned to this board (can view/edit card details, but NOT add/delete cards)
     const isAssignedToBoard = boardId ? (currentUserMember?.assignedBoardIds.includes(boardId) ?? false) : false;
-    // Can add cards: privileged roles OR assigned to the board
-    const canAddCard = hasPermission || isAssignedToBoard;
+    // Only privileged roles can create/delete cards
+    const canAddCard = hasPermission;
 
     if (!board) {
         return (
@@ -482,7 +482,7 @@ export const Board = () => {
                     task={selectedTask.task}
                     listId={selectedTask.listId}
                     onSave={handleSaveTask}
-                    readOnly={!canAddCard}
+                    readOnly={!(hasPermission || isAssignedToBoard)}
                 />
             )}
 
