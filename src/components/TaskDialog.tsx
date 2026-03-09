@@ -34,6 +34,7 @@ interface TaskDialogProps {
   listId: string;
   onSave: (taskId: string, updates: Partial<Task>) => Promise<void>;
   readOnly?: boolean;
+  canViewAttachments?: boolean;
 }
 
 export const TaskDialog: React.FC<TaskDialogProps> = ({
@@ -42,6 +43,7 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
   task,
   onSave,
   readOnly = false,
+  canViewAttachments = true,
 }) => {
   const { success, error: toastError } = useToast();
 
@@ -184,6 +186,7 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
         </div>
 
         {/* External Link */}
+        {canViewAttachments && (
         <TextField
           label="External Link"
           fullWidth
@@ -212,8 +215,10 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
             },
           }}
         />
+        )}
 
         {/* Attachments */}
+        {canViewAttachments && (
         <div>
           <Typography
             variant="subtitle2"
@@ -313,6 +318,7 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
             ))}
           </List>
         </div>
+        )}
       </DialogContent>
 
       <DialogActions sx={{ borderTop: '1px solid rgba(255,255,255,0.08)', px: 3, py: 2 }}>

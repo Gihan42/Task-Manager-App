@@ -221,7 +221,7 @@ export const Board = () => {
                                                                                             {card.content}
                                                                                         </span>
                                                                                         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-0.5 shrink-0">
-                                                                                            {canAddCard && (
+                                                                                            {canMove && (
                                                                                                 <IconButton 
                                                                                                     onClick={() => handleTaskClick(card, list.id)}
                                                                                                     size="small"
@@ -243,18 +243,20 @@ export const Board = () => {
                                                                                     </div>
                                                                                     
                                                                                     {/* Indicators for attachments/github */}
-                                                                                    <div className="flex gap-2 mt-1">
-                                                                                        {card.externalLink && (
-                                                                                            <div className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded flex items-center gap-1">
-                                                                                                Link
-                                                                                            </div>
-                                                                                        )}
-                                                                                        {card.files && card.files.length > 0 && (
-                                                                                            <div className="text-[10px] bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded flex items-center gap-1">
-                                                                                                {card.files.length} File{card.files.length > 1 ? 's' : ''}
-                                                                                            </div>
-                                                                                        )}
-                                                                                    </div>
+                                                                                    {canMove && (
+                                                                                        <div className="flex gap-2 mt-1">
+                                                                                            {card.externalLink && (
+                                                                                                <div className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                                                                                    Link
+                                                                                                </div>
+                                                                                            )}
+                                                                                            {card.files && card.files.length > 0 && (
+                                                                                                <div className="text-[10px] bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                                                                                    {card.files.length} File{card.files.length > 1 ? 's' : ''}
+                                                                                                </div>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    )}
                                                                                 </div>
                                                                             <div className="flex flex-col gap-2 pt-2 border-t border-border/50 text-xs">
                     
@@ -482,7 +484,8 @@ export const Board = () => {
                     task={selectedTask.task}
                     listId={selectedTask.listId}
                     onSave={handleSaveTask}
-                    readOnly={!(hasPermission || isAssignedToBoard)}
+                    readOnly={!(hasPermission || (selectedTask.task.assignees?.includes(currentUserMember?.name || '') ?? false))}
+                    canViewAttachments={hasPermission || (selectedTask.task.assignees?.includes(currentUserMember?.name || '') ?? false)}
                 />
             )}
 
