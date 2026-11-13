@@ -1,9 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { type User, onAuthStateChanged, signOut, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from 'firebase/auth';
+import { type User, onAuthStateChanged, signOut, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail, type UserCredential } from 'firebase/auth';
 import { doc, getDoc, writeBatch } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import defaultRoles from '../data/roles.json';
 import { setDoc } from 'firebase/firestore';
+
+
+
 
 interface AuthContextType {
     user: User | null;
@@ -11,7 +14,7 @@ interface AuthContextType {
     logout: () => Promise<void>;
     signup: (email: string, password: string, name: string) => Promise<void>;
     login: (email: string, password: string) => Promise<void>;
-    loginWithGoogle: () => Promise<void>;
+    loginWithGoogle: () => Promise<UserCredential>;
     resetPassword: (email: string) => Promise<void>;
 }
 
@@ -81,13 +84,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(auth.currentUser);
     };
 
-    const loginWithGoogle = async () => {
+    const loginWithGoogle = async (): Promise<UserCredential> => {
         try {
             const provider = new GoogleAuthProvider();
             const result = await signInWithPopup(auth, provider);
             // The signed-in user info.
             const user = result.user;
             await checkCreateUserDoc(user);
+            return result;
         } catch (error: any) {
             console.error("Google Sign-in failed", error);
             throw error;

@@ -6,6 +6,15 @@ import { AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
+
+interface RegisterForm {
+    name: string;
+    email: string;
+    password: string;
+}
+
+
+
 export const Signup = () => {
     const navigate = useNavigate();
     const { signup, loginWithGoogle } = useAuth();
@@ -16,14 +25,22 @@ export const Signup = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
+
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);
         try {
-            await signup(email, password, name);
-            toast.success('Account created successfully!');
-            navigate('/');
+            const registerForm: RegisterForm = { name, email, password };
+            if(await  registerEmployee(registerForm) === true) {
+                await signup(email, password, name);
+                toast.success('Account created successfully!');
+                navigate('/');
+            }
+            else {
+                toast.error('Failed to register employee in the system');
+            }
         } catch (err: any) {
             const errorMessage = err.code === 'auth/email-already-in-use' 
                 ? 'This email is already registered' 
@@ -40,14 +57,60 @@ export const Signup = () => {
     const handleSocialLogin = async (provider: string) => {
         if (provider === 'google') {
             try {
-                await loginWithGoogle();
+                const result = await loginWithGoogle();
+
+                const registerForm: RegisterForm = {
+                    name: result.user.displayName ?? '',
+                    email: result.user.email ?? '',
+                    password: '',
+                };
+                if(await  registerEmployee(registerForm) === true) {
                 toast.success('Account created successfully!');
                 navigate('/');
+                }
+                else {
+                    navigate('/');
+                }
             } catch (err: any) {
                 const errorMessage = 'Failed to sign up with Google';
                 setError(errorMessage);
                 toast.error(errorMessage);
             }
+        }
+    };
+
+    const registerEmployee = async (registerForm: RegisterForm): Promise<boolean> => {
+        try {
+            const payload = {
+
+                fullName: registerForm.name,
+                email: registerForm.email,
+                password: registerForm.password,
+
+
+                employeeId: `EMP${Date.now()}`,
+                joinDate: new Date().toISOString().split('T')[0],
+                nic: `NIC${Date.now()}`,
+                address1: 'N/A',
+                empType: 'Permanent',
+                contact1: '0000000000',
+            };
+
+            const response = await fetch(`${import.meta.env.VITE_API_URL}employee/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                const err = await response.json().catch(() => null);
+                throw new Error(err?.message || 'Failed to register employee');
+            }
+
+            return true;
+        } catch (error) {
+            console.error('Error registering employee:', error);
+            return false;
         }
     };
 
