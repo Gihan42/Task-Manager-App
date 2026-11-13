@@ -60,7 +60,7 @@ export const AppLayout = () => {
         <div className="p-4 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(var(--border) / 0.3)', height: '64px', flexShrink: 0 }}>
           {!isCollapsed && (
              <h1 className="font-bold text-xl truncate animate-fade-in" style={{ color: 'hsl(var(--primary))' }}>
-                TaskFlow
+                 My Office
              </h1>
           )}
           <button 

@@ -63,7 +63,7 @@ export const Dashboard = () => {
                     transition={{ delay: 0.3, duration: 0.8 }}
                     className="hero-heading mb-6"
                 >
-                    TaskFlow
+                    My Office
                 </motion.h1>
 
                 <motion.p
