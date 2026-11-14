@@ -6,6 +6,10 @@ import { AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
+interface LoginForm {
+    email: string;
+    password: string;
+}
 export const Login = () => {
     const navigate = useNavigate();
     const { login, loginWithGoogle } = useAuth();
@@ -20,9 +24,15 @@ export const Login = () => {
         setError('');
         setLoading(true);
         try {
-            await login(email, password);
-            toast.success('Welcome back!');
-            navigate('/');
+            if(await loginForm({ email, password }) === true) {
+                await login(email, password);
+                toast.success('Welcome back!');
+                navigate('/');
+            }
+            else {
+                toast.error('Failed to login user in the system');
+            }
+
         } catch (err: any) {
             const errorMessage = err.code === 'auth/invalid-credential' 
                 ? 'Invalid email or password' 
@@ -47,6 +57,33 @@ export const Login = () => {
             }
         }
     };
+
+    const loginForm = async (formData: LoginForm) : Promise<boolean> => {
+
+        try {
+            const payload = {
+                email: formData.email,
+                password: formData.password
+            }
+            const response = await fetch(`${import.meta.env.VITE_API_URL}employee/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            console.log(response)
+            if (!response.ok) {
+                const err = await response.json().catch(() => null);
+                throw new Error(err?.message || 'Failed to login user');
+            }
+            return true;
+        }catch (error){
+            console.error('Error logging in:', error);
+            return false;
+        }
+    }
+
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-muted/20 animate-fade-in p-4">
