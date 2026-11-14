@@ -11,6 +11,7 @@ interface RegisterForm {
     name: string;
     email: string;
     password: string;
+    googleAccount:boolean;
 }
 
 
@@ -24,15 +25,21 @@ export const Signup = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-
+    const [itsGoogleAccount, setItsGoogleAccount] = useState(false);
 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setItsGoogleAccount(false);
         setLoading(true);
         try {
-            const registerForm: RegisterForm = { name, email, password };
+            const registerForm: RegisterForm = {
+                name,
+                email,
+                password,
+                googleAccount: false,
+            };
             if(await  registerEmployee(registerForm) === true) {
                 await signup(email, password, name);
                 toast.success('Account created successfully!');
@@ -56,6 +63,7 @@ export const Signup = () => {
 
     const handleSocialLogin = async (provider: string) => {
         if (provider === 'google') {
+            setItsGoogleAccount(true);
             try {
                 const result = await loginWithGoogle();
 
@@ -63,8 +71,10 @@ export const Signup = () => {
                     name: result.user.displayName ?? '',
                     email: result.user.email ?? '',
                     password: '',
+                    googleAccount:true
+
                 };
-                if(await  registerEmployee(registerForm) === true) {
+                if(await registerEmployee(registerForm) === true) {
                 toast.success('Account created successfully!');
                 navigate('/');
                 }
@@ -86,7 +96,7 @@ export const Signup = () => {
                 fullName: registerForm.name,
                 email: registerForm.email,
                 password: registerForm.password,
-
+                
 
                 employeeId: `EMP${Date.now()}`,
                 joinDate: new Date().toISOString().split('T')[0],
@@ -94,6 +104,8 @@ export const Signup = () => {
                 address1: 'N/A',
                 empType: 'Permanent',
                 contact1: '0000000000',
+                googleAccount: registerForm.googleAccount
+
             };
 
             const response = await fetch(`${import.meta.env.VITE_API_URL}employee/register`, {
@@ -106,7 +118,10 @@ export const Signup = () => {
                 const err = await response.json().catch(() => null);
                 throw new Error(err?.message || 'Failed to register employee');
             }
-
+            localStorage.setItem('access_token', (await response.json()).data.access_token);
+            localStorage.setItem('refresh_token', (await response.json()).data.refresh_token);
+            localStorage.setItem('email', (await response.json()).data.email);
+            localStorage.setItem('role',(await response.json()).data.role );
             return true;
         } catch (error) {
             console.error('Error registering employee:', error);

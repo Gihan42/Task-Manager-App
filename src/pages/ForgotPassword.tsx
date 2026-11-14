@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { AlertCircle, CheckCircle, ArrowLeft, Mail } from 'lucide-react';
@@ -7,7 +7,9 @@ import { useAuth } from '../context/AuthContext';
 
 export const ForgotPassword = () => {
     const { resetPassword } = useAuth();
-    const [email, setEmail] = useState('');
+    const location = useLocation();
+    const initialEmail = (location.state as { email?: string })?.email || '';
+    const [email, setEmail] = useState(initialEmail);
     const [submittedEmail, setSubmittedEmail] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);

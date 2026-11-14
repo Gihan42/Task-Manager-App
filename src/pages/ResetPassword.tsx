@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { confirmPasswordReset, verifyPasswordResetCode } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { Input } from '../components/ui/Input';
@@ -8,21 +8,30 @@ import { AlertCircle, CheckCircle, ArrowLeft, Lock } from 'lucide-react';
 
 export const ResetPassword = () => {
     const [params] = useSearchParams();
+    const location = useLocation();
     const navigate = useNavigate();
     const oobCode = params.get('oobCode') ?? '';
+    const stateEmail = (location.state as { email?: string })?.email ?? '';
 
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [verifying, setVerifying] = useState(true);
-    const [verifiedEmail, setVerifiedEmail] = useState('');
+    const [verifying, setVerifying] = useState(!stateEmail && !!oobCode);
+    const [verifiedEmail, setVerifiedEmail] = useState(stateEmail);
     const [success, setSuccess] = useState(false);
 
     useEffect(() => {
+
+        if (stateEmail) {
+            setVerifiedEmail(stateEmail);
+            setVerifying(false);
+            return;
+        }
+
         const verifyCode = async () => {
             if (!oobCode) {
-                setError('Invalid or missing reset link. Please request a new one.');
+                setError('No email or reset link provided. Please enter your email on the login page.');
                 setVerifying(false);
                 return;
             }
@@ -36,12 +45,11 @@ export const ResetPassword = () => {
             }
         };
         verifyCode();
-    }, [oobCode]);
+    }, [oobCode, stateEmail]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-
 
         if (password !== confirmPassword) {
             setError('Passwords do not match');
@@ -56,17 +64,21 @@ export const ResetPassword = () => {
         setLoading(true);
         try {
 
-            await confirmPasswordReset(auth, oobCode, password);
-
-
-            await fetch(`${import.meta.env.VITE_API_URL}employee/reset-password`, {
+            if (oobCode) {
+                await confirmPasswordReset(auth, oobCode, password);
+            }
+            const response = await fetch(`${import.meta.env.VITE_API_URL}employee/reset-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: verifiedEmail, newPassword: password }),
             });
 
-            setSuccess(true);
+            if (!response.ok) {
+                const errData = await response.json().catch(() => null);
+                throw new Error(errData?.message || 'Failed to update password in database');
+            }
 
+            setSuccess(true);
 
             setTimeout(() => {
                 navigate('/login');
