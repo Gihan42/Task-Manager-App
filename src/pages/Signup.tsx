@@ -31,29 +31,33 @@ export const Signup = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        setItsGoogleAccount(false);
         setLoading(true);
         try {
+            // 1. Firebase eke account eka hadanawa
+            await signup(email, password, name);
+
+            // 2. Backend DB ekata save karanawa
             const registerForm: RegisterForm = {
                 name,
                 email,
                 password,
                 googleAccount: false,
             };
-            if(await  registerEmployee(registerForm) === true) {
-                await signup(email, password, name);
-                toast.success('Account created successfully!');
-                navigate('/');
+            const saved = await registerEmployee(registerForm);
+
+            if (!saved) {
+                toast.error('Account created, but failed to save employee in the system');
+                return;
             }
-            else {
-                toast.error('Failed to register employee in the system');
-            }
+
+            toast.success('Account created successfully!');
+            navigate('/');
         } catch (err: any) {
-            const errorMessage = err.code === 'auth/email-already-in-use' 
-                ? 'This email is already registered' 
+            const errorMessage = err.code === 'auth/email-already-in-use'
+                ? 'This email is already registered'
                 : err.code === 'auth/weak-password'
-                ? 'Password should be at least 6 characters'
-                : err.message || 'Failed to create account';
+                    ? 'Password should be at least 6 characters'
+                    : err.message || 'Failed to create account';
             setError(errorMessage);
             toast.error(errorMessage);
         } finally {
@@ -92,20 +96,16 @@ export const Signup = () => {
     const registerEmployee = async (registerForm: RegisterForm): Promise<boolean> => {
         try {
             const payload = {
-
                 fullName: registerForm.name,
                 email: registerForm.email,
                 password: registerForm.password,
-                
-
                 employeeId: `EMP${Date.now()}`,
                 joinDate: new Date().toISOString().split('T')[0],
                 nic: `NIC${Date.now()}`,
                 address1: 'N/A',
                 empType: 'Permanent',
                 contact1: '0000000000',
-                googleAccount: registerForm.googleAccount
-
+                googleAccount: registerForm.googleAccount,
             };
 
             const response = await fetch(`${import.meta.env.VITE_API_URL}employee/register`, {
@@ -118,10 +118,16 @@ export const Signup = () => {
                 const err = await response.json().catch(() => null);
                 throw new Error(err?.message || 'Failed to register employee');
             }
-            localStorage.setItem('access_token', (await response.json()).data.access_token);
-            localStorage.setItem('refresh_token', (await response.json()).data.refresh_token);
-            localStorage.setItem('email', (await response.json()).data.email);
-            localStorage.setItem('role',(await response.json()).data.role );
+
+            const resJson = await response.json();
+            const data = resJson?.data;
+
+
+            if (data?.token) localStorage.setItem('access_token', data.token);
+            if (data?.refreshToken) localStorage.setItem('refresh_token', data.refreshToken);
+            if (data?.email) localStorage.setItem('email', data.email);
+            if (data?.role) localStorage.setItem('role', data.role);
+
             return true;
         } catch (error) {
             console.error('Error registering employee:', error);

@@ -6,7 +6,7 @@ import { AlertCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { saveAuthData } from "../lib/auth-storage";
-
+import { backendGoogleAuth } from "../api/googleAuth";
 interface LoginForm {
   email: string;
   password: string;
@@ -55,10 +55,11 @@ const handleSubmit = async (e: React.FormEvent) => {
     if (!backendOk) {
       toast.error("Invalid email or password");
       return;
+    }else{
+        toast.success("Welcome back!");
+        navigate("/");
     }
 
-    toast.success("Welcome back!");
-    navigate("/");
   } catch (err: any) {
     const errorMessage = err.message || "Failed to login";
     setError(errorMessage);
@@ -68,31 +69,85 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
 };
 
+    // const handleSocialLogin = async (provider: string) => {
+    //     if (provider === 'google') {
+    //         try {
+    //             const result = await loginWithGoogle();
+    //             const ok = await backendGoogleAuth(result.user);
+    //
+    //
+    //
+    //             const email = result.user.email ?? ''
+    //             const response = await fetch(
+    //                 `${import.meta.env.VITE_API_URL}employee/${encodeURIComponent(email)}`
+    //             );
+    //
+    //             if (response.ok) {
+    //                 if (!ok) {
+    //                     toast.error("Failed to sign in with the server");
+    //                     return;
+    //                 }
+    //
+    //                 const resJson = await response.json().catch(() => null);
+    //                 if (resJson?.data && typeof resJson.data === 'object') {
+    //                     saveAuthData(resJson.data);
+    //                 }
+    //                 const backendOk = await loginForm({ email, password });
+    //
+    //                 if (!backendOk) {
+    //                     toast.error("Invalid email or password");
+    //                     return;
+    //                 }else{
+    //                     toast.success("Welcome back!");
+    //                     navigate("/");
+    //                 }
+    //
+    //             }
+    //
+    //             const errData = await response.json().catch(() => null);
+    //             setForgotPasswordWarning(errData?.message || "User not found in this email");
+    //             return;
+    //
+    //         } catch (err: any) {
+    //             const errorMessage = 'Failed to login with Google';
+    //             setError(errorMessage);
+    //             toast.error(errorMessage);
+    //         }
+    //     }
+    // };
     const handleSocialLogin = async (provider: string) => {
-        if (provider === 'google') {
+        if (provider === "google") {
             try {
-                const result = await loginWithGoogle();
-                const email = result.user.email ?? ''
+                const result = await loginWithGoogle(); // Firebase popup
+                const email = result.user.email ?? "";
+
+
                 const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}employee/${encodeURIComponent(email)}`
+                    `${import.meta.env.VITE_API_URL}employee/${encodeURIComponent(email)}`,
                 );
 
-                if (response.ok) {
-                    const resJson = await response.json().catch(() => null);
-                    if (resJson?.data && typeof resJson.data === 'object') {
-                        saveAuthData(resJson.data);
-                    }
-                    toast.success('Welcome back!');
-                    navigate('/');
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => null);
+                    setForgotPasswordWarning(errData?.message || "User not found in this email");
                     return;
                 }
 
-                const errData = await response.json().catch(() => null);
-                setForgotPasswordWarning(errData?.message || "User not found in this email");
-                return;
+                const resJson = await response.json().catch(() => null);
+                if (resJson?.data && typeof resJson.data === "object") {
+                    saveAuthData(resJson.data);
+                }
 
+
+                const ok = await backendGoogleAuth(result.user);
+                if (!ok) {
+                    toast.error("Failed to sign in with the server");
+                    return;
+                }
+
+                toast.success("Welcome back!");
+                navigate("/");
             } catch (err: any) {
-                const errorMessage = 'Failed to login with Google';
+                const errorMessage = "Failed to login with Google";
                 setError(errorMessage);
                 toast.error(errorMessage);
             }
@@ -122,15 +177,14 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     const resJson = await response.json(); 
     const data = resJson?.data;
-    console.log('weda')
     if (!data) {
       throw new Error("Invalid response from server");
     }
 
     saveAuthData(data);
 
-    localStorage.setItem("access_token", data.access_token);
-    localStorage.setItem("refresh_token", data.refresh_token);
+    localStorage.setItem("access_token", data.token);
+    localStorage.setItem("refresh_token", data.refreshToken);
     localStorage.setItem("email", data.email);
     localStorage.setItem("role", data.role);
 
