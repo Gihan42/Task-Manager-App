@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, KanbanSquare, Users, LogOut, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
+import { LayoutDashboard, KanbanSquare, Users, LogOut, ChevronLeft, ChevronRight, FileText, IdCardLanyard } from 'lucide-react';
 import { ModeToggle } from '../components/ModeToggle';
 import { useAuth } from '../context/AuthContext';
 
@@ -39,13 +39,23 @@ export const AppLayout = () => {
   }
 
   const email = localStorage.getItem('email') ?? '';
-  const displayName = user?.displayName || email.split('@')[0] || 'User';
+    const nameFromEmail = email
+        .split('@')[0]
+        .replace(/[0-9]/g, '')
+        .split(/[._-]/)[0];
+
+    const displayName =
+        user?.displayName ||
+        (nameFromEmail
+            ? nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1)
+            : 'User');
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
     { icon: KanbanSquare, label: 'Boards', path: '/boards' },
     { icon: FileText, label: 'Project Files', path: '/project-files' },
     { icon: Users, label: 'Team', path: '/team' },
+    { icon: IdCardLanyard, label: 'Employee', path: '/employee' },
   ];
 
   return (
@@ -154,6 +164,8 @@ export const AppLayout = () => {
             })}
           </ul>
         </nav>
+
+
 
         <div className="p-3" style={{ borderTop: '1px solid hsl(var(--border) / 0.3)', flexShrink: 0 }}>
           <button

@@ -10,6 +10,7 @@ import { Boards } from './pages/Boards';
 import { Board } from './pages/Board';
 import { Team } from './pages/TeamPage';
 import { ProjectFiles } from './pages/ProjectFiles';
+import { Employee } from './pages/Employee';
 
 import { NotFound } from './pages/NotFound';
 
@@ -27,6 +28,7 @@ function App() {
         <Route path="board/:boardId" element={<Board />} />
         <Route path="project-files" element={<ProjectFiles />} />
         <Route path="team" element={<Team />} />
+        <Route path="employee" element={<Employee />} />
       </Route>
 
       {/* Catch-all 404 */}
