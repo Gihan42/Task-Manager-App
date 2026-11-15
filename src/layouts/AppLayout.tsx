@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, KanbanSquare, Users, LogOut, ChevronLeft, ChevronRight, FileText, IdCardLanyard } from 'lucide-react';
+import { LayoutDashboard, KanbanSquare, Users, LogOut, ChevronLeft, ChevronRight, FileText, IdCardLanyard, FileTypeCorner   } from 'lucide-react';
 import { ModeToggle } from '../components/ModeToggle';
 import { useAuth } from '../context/AuthContext';
 
@@ -56,6 +56,7 @@ export const AppLayout = () => {
     { icon: FileText, label: 'Project Files', path: '/project-files' },
     { icon: Users, label: 'Team', path: '/team' },
     { icon: IdCardLanyard, label: 'Employee', path: '/employee' },
+    { icon: FileTypeCorner , label: 'Leave-Type', path: '/leaveType' },
   ];
 
   return (

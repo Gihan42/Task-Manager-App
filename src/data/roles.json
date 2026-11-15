@@ -5,7 +5,8 @@
     "Developer",
     "Designer",
     "Tester",
-    "Project Manager"
+    "Project Manager",
+    "Hr"
   ],
   "permissions": {
     "canAddNewProject": [
@@ -16,7 +17,8 @@
     "canAccessTeamPage": [
       "Manager",
       "TechLead",
-      "Project Manager"
+      "Project Manager",
+      "Hr"
     ]
   },
   "description": "Default application roles and permissions"

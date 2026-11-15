@@ -11,6 +11,7 @@ import { Board } from './pages/Board';
 import { Team } from './pages/TeamPage';
 import { ProjectFiles } from './pages/ProjectFiles';
 import { Employee } from './pages/Employee';
+import { LeaveType } from "./pages/LeaveType.tsx";
 
 import { NotFound } from './pages/NotFound';
 
@@ -29,6 +30,7 @@ function App() {
         <Route path="project-files" element={<ProjectFiles />} />
         <Route path="team" element={<Team />} />
         <Route path="employee" element={<Employee />} />
+        <Route path="leaveType" element={<LeaveType />} />
       </Route>
 
       {/* Catch-all 404 */}

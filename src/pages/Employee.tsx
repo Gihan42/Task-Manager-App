@@ -84,7 +84,7 @@ const tdStyle: CSSProperties = {
     fontSize: 14,
 };
 
-/* Sidebar collapse unath layout eka ekama widiyata thiyenna auto-fill grid */
+
 const gridStyle = (min: number): CSSProperties => ({
     display: 'grid',
     gridTemplateColumns: `repeat(auto-fill, minmax(${min}px, 1fr))`,
@@ -92,7 +92,7 @@ const gridStyle = (min: number): CSSProperties => ({
     width: '100%',
 });
 
-/* Input / select / date okkoma ekama style (global CSS override karanna !important) */
+
 const themeCss = `
 .emp-input { color-scheme: light; }
 .dark .emp-input { color-scheme: dark; }
