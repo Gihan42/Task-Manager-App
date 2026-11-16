@@ -12,6 +12,7 @@ import { Team } from './pages/TeamPage';
 import { ProjectFiles } from './pages/ProjectFiles';
 import { Employee } from './pages/Employee';
 import { LeaveType } from "./pages/LeaveType.tsx";
+import { LeaveAllocate } from "./pages/leave-allocate.tsx";
 
 import { NotFound } from './pages/NotFound';
 
@@ -31,6 +32,7 @@ function App() {
         <Route path="team" element={<Team />} />
         <Route path="employee" element={<Employee />} />
         <Route path="leaveType" element={<LeaveType />} />
+        <Route path="leaveAllocate" element={<LeaveAllocate />} />
       </Route>
 
       {/* Catch-all 404 */}

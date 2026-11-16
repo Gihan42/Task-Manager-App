@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { LayoutDashboard, CheckCircle2, ListTodo, Clock, ArrowRight, Sparkles } from 'lucide-react';
+import { LayoutDashboard, CheckCircle2,ChartGantt , ListTodo, Clock, ArrowRight, AudioWaveform, FileText } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useBoard } from '../hooks/useBoard';
 import { motion } from 'framer-motion';
@@ -53,8 +53,8 @@ export const Dashboard = () => {
                     transition={{ delay: 0.2, duration: 0.8 }}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 backdrop-blur-sm"
                 >
-                    <Sparkles className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium text-primary">Modern Task Management</span>
+                    <AudioWaveform className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium text-primary">Modern Task Management & Leave Management</span>
                 </motion.div>
 
                 <motion.h1 
@@ -72,7 +72,7 @@ export const Dashboard = () => {
                     transition={{ delay: 0.4, duration: 0.8 }}
                     className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed"
                 >
-                    Organize your work, collaborate with your team, and achieve your goals with our modern task management platform.
+                    Organize your work, collaborate with your team, and achieve your goals with our modern task management and leave management platform.
                 </motion.p>
 
                 <motion.div
@@ -224,6 +224,85 @@ export const Dashboard = () => {
                             Monitor your team's progress with real-time updates
                         </p>
                     </motion.div>
+
+                    <motion.div
+                        whileHover={{ y: -8 }}
+                        className="glass-card text-center"
+                    >
+                        <div className="inline-flex p-4 rounded-2xl bg-green-500/10 mb-4">
+                            <ChartGantt  className="w-8 h-8 text-green-500" />
+                        </div>
+                        <h3 className="text-xl font-bold mb-2">Leave Manage</h3>
+                        <p className="text-muted-foreground">
+                            Manage employee leaves and approvals efficiently
+                        </p>
+                    </motion.div>
+
+                    <motion.div
+                        className="glass-card text-center"
+                        aria-disabled="true"
+                        style={{ opacity: 0.6, cursor: 'not-allowed', position: 'relative' }}
+                    >
+                        <style>{`
+        @keyframes docs-loading {
+            0%   { left: -40%; }
+            100% { left: 100%; }
+        }
+        @keyframes docs-shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    `}</style>
+
+                        <div className="inline-flex p-4 rounded-2xl bg-amber-500/10 mb-4">
+                            <FileText className="w-8 h-8 text-amber-500" />
+                        </div>
+
+                        <h3 className="text-xl font-bold mb-2">Employee Documents</h3>
+                        <p className="text-muted-foreground">
+                            Request service letters and salary slips, and get them issued by the company
+                        </p>
+
+                        <div style={{ marginTop: 20 }}>
+                            <div
+                                style={{
+                                    marginBottom: 6,
+                                    fontSize: 12,
+                                    textAlign: 'left',
+                                    color: 'hsl(var(--muted-foreground))',
+                                }}
+                            >
+                                Coming soon ....
+                            </div>
+
+                            <div
+                                style={{
+                                    position: 'relative',
+                                    width: '100%',
+                                    height: 8,
+                                    borderRadius: 999,
+                                    background: 'hsl(var(--muted))',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        height: '100%',
+                                        width: '40%',
+                                        borderRadius: 999,
+                                        background:
+                                            'linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6)',
+                                        backgroundSize: '200% 100%',
+                                        animation:
+                                            'docs-loading 1.6s ease-in-out infinite, docs-shimmer 2s linear infinite',
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </motion.div>
+
                 </div>
             </motion.section>
         </div>
