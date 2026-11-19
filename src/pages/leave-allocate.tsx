@@ -323,7 +323,7 @@ export const LeaveAllocate = () => {
             });
 
             if (!response.ok) {
-                throw new Error(await readError(response, "Failed to create leave allocation"));
+                throw new Error(await readError(response , "Failed to create leave allocation"));
             }
 
             await loadAllocations();
